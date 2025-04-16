@@ -1,3 +1,14 @@
+/* 
+ *  Meshell is a simple shell made in C.
+ *  Written by Davide Ferrara for Uni Project
+ *
+ * TODO:
+ * - Implementare history command
+ * - Implementare help command
+ * - cd ~/un persorso non funziona
+ * - cd enter da errore
+ * */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,26 +21,28 @@
 #include <readline/history.h>
 #include <linux/limits.h>
 #include <stdarg.h>
+#include <errno.h>
 
 
 #define RED   "\x1B[31m"
 #define GRN   "\x1B[32m"
 #define YEL   "\x1B[33m"
-#define BLU   "\x1B[34m"
-#define MAG   "\x1B[35m"
-#define CYN   "\x1B[36m"
+#define CYN   "\x1B[34m"
 #define WHT   "\x1B[37m"
 #define RESET "\x1B[0m"
-#define BOLD "\033[1m"
+#define BOLD  "\033[1m"
 
 #define log_info(...) tracelog(LOG_INFO, __VA_ARGS__)
 #define log_err(...) tracelog(LOG_ERROR, __VA_ARGS__)
 #define log_warn(...) tracelog(LOG_WARNING, __VA_ARGS__)
 #define log_debug(...) tracelog(LOG_DEBUG, __VA_ARGS__)
 
-#define MAX_ARGS 64
 #define LOGIN_NAME getlogin()
 #define OS_NAME get_os_name()
+#define HOME getenv("HOME")
+#define MAX_ARGS 64
+#define ROOT "/"
+#define TILDE "~"
 
 
 typedef enum {
@@ -40,17 +53,15 @@ typedef enum {
 } loglevel;
 
 
+int cd(char* prompt, char* args[]);
 bool gen_prompt(char* prompt);
-void str_to_lowercase(char* str);
 char* get_os_name(void);
+void str_to_lowercase(char* str);
 void parse_input(char* input, char* args[]);
 void tracelog(loglevel level, char* fmt, ...);
 
-
 int main()
 {
-  const char *bold = "\033[1m";
-
   char cwd[PATH_MAX]; 
   char* prompt = (char*)malloc((PATH_MAX + 1024) * sizeof(char));
   char* home_path = (char*)malloc(1024 * sizeof(char));
@@ -75,8 +86,6 @@ int main()
   using_history();
 
   while (1) {
-    pid_t pid;
-
     // Display prompt and read input
     char* input = readline(prompt);
 
@@ -84,29 +93,22 @@ int main()
     if (!input)
       break;
 
-    if(strcmp(input, "exit") == 0)
-      break;
-
     if(input) {
       char* args[MAX_ARGS];
       parse_input(input, args);
 
-      char *cmd = args[0];
-      // CD COMMAND
-      if(strcmp(cmd, "cd") == 0) {
-        char *path = args[1];
-        if(path == NULL)
-          chdir("/");
+      char* cmd = args[0];
 
-        if(!chdir(path) == 0 && path != NULL)
-          log_err("could not find specified path!");
-
-        if(!gen_prompt(prompt))
-          log_err("could not generate prompt");
+      if(strcmp(input, "exit") == 0)
+        break;
+      else if(strcmp(cmd, "cd") == 0) {
+        if(cd(prompt, args)){
+          log_err("cd command not available...");
+        }
 
       } else {
 
-        pid = fork();
+        pid_t pid = fork();
 
         if(pid == 0) {
 
@@ -115,7 +117,7 @@ int main()
         } else if (pid > 0) {
           wait(NULL);
         } else {
-          log_err("Could not fork Mishell process!");
+          log_err("could not fork...");
         }
       }
 
@@ -128,6 +130,24 @@ int main()
     free(input);
   }
   exit(0);
+}
+
+int cd(char* prompt, char* args[]) {
+  char* path = args[1];
+
+  if(path == NULL) 
+    chdir(ROOT);
+  else if(strcmp(path, TILDE) == 0) {
+    chdir(HOME);
+  } else if(chdir(path) == -1)
+    log_err("%s", strerror(errno));
+
+  // Update the prompt
+  if(!gen_prompt(prompt)){
+    log_err("could not generate prompt");
+    return -1;
+  }
+  return 0;
 }
 
 
@@ -145,7 +165,7 @@ char* get_os_name(void) {
   FILE* file = fopen("/etc/os-release", "r");
 
   if(file == NULL) {
-    fprintf(stderr, "Could not find os release!\n");
+    log_err("Could not find os release");
     os_name = "unknown";
     return os_name;
   }
