@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+  <meta charset="utf-8">
+  <title>Meshell Web SSH Terminal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
+  <script src="./static/index.js" type="text/javascript" defer></script>
+  <link rel="stylesheet" href="./static/style.css">
+</head>
+
+<body>
+  <header>💻 Meshell SSH Web Terminal</header>
+
+  <div id="meshell-container">
+    <button onclick="showTerminal('1')">Lab 1</button>
+    <button onclick="showTerminal('2')">Lab 2</button>
+    <div id="lab1">
+      <div id="lab1-term"></div>
+      <p>Sistema</p>
+      <div id="system-cmd">
+        <button id="uptime">Uptime</button>
+        <button id="uname -a">Info</button>
+        <button id="free">Utilizzo RAM</button>
+        <button id="ps">Processi</button>
+        <button id="ps-tree">Albero processi</button>
+        <button id="top">TOP</button>
+        <button id="kill">Chiudi Processo</button>
+        <button id="groups">Gruppi</button>
+        <button id="idc">ID</button>
+        <button id="w">Chi é connesso</button>
+        <button id="whoami">Chi sono</button>
+        <button id="last">Storico Login</button>
+        <button id="aptu">Aggiorna Sistema</button>
+        <button id="apti">Installa Pacchetto</button>
+        <button id="aptq">Cerca Pacchetto</button>
+        <button id="aptr">Rimuovi Pacchetto</button>
+        <button id="shutdown">Spegni</button>
+        <button id="reboot">Reboot</button>
+      </div>
+      <p>Cartelle</p>
+      <div id="system-files">
+        <button id="ls">Lista</button>
+        <button id="mkdir">Crea</button>
+        <button id="tree">Albero</button>
+        <button id="ln">Link Simbolico</button>
+        <button id="umask">Umask</button>
+        <button id="chmod">Chmod</button>
+        <button id="chown">Cambia Proprietario</button>
+        <button id="chgpr">Cambia Gruppo</button>
+        <button id="mknod">Crea nodo</button>
+        <button id="mkfifo">Crea FIFO</button>
+        <button id="lsatrr">Lista attributi</button>
+        <button id="lsatrr">Lista attributi</button>
+      </div>
+      <p>Shell</p>
+      <div id="system-shell">
+        <button id="which">Which</button>
+        <button id="type">Type</button>
+        <button id="alias">Alias</button>
+        <button id="rmalias">Rimuovi Alias</button>
+      </div>
+      <p>Rete</p>
+      <div id="system-net">
+        <button id="ping">Ping</button>
+        <button id="wget">Wget</button>
+        <button id="curl">Curl</button>
+        <button id="ip">Interfacce di rete</button>
+        <button id="netcat">Netcat</button>
+        <button id="portman">Portmap</button>
+        <button id="dig">Dig</button>
+        <button id="host">Host</button>
+        <button id="nslookup">Nslookup</button>
+      </div>
+      <div id="controls">
+        <button id="open">Apri connessione</button>
+        <button id="close">Chiudi connessione</button>
+      </div>
+    </div>
+    <div id="lab2" style="display: none;">
+      <h1>INOP</h1>
+      <div id="lab2-term"></div>
+    </div>
+  </div>
+</body>
+
+</html>
