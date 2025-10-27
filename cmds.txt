@@ -1,0 +1,6 @@
+uptime -ps
+free -h
+ps aux --forest
+w
+last -n 10
+df -hT
