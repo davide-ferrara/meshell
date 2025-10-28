@@ -51,16 +51,27 @@
       </header>
       <hr />
 
-      <div role="group" class="tabs">
-        <button aria-current="true">Lab 1</button>
-        <br />
-        <button>Lab 2</button>
-        <button>Lab 3</button>
-        <button>Lab 4</button>
+      <div role="group" id="tabs">
+        <button aria-current="true" id="terminal-lab1-tab">Lab 1</button>
+        <button id="terminal-lab2-tab">Lab 2</button>
+        <button id="terminal-lab3-tab">Lab 3</button>
+        <button id="terminal-lab4-tab">Lab 4</button>
       </div>
 
-      <article>
+      <article id="terminal-lab1-container">
         <div id="terminal-lab1"></div>
+      </article>
+
+      <article id="terminal-lab2-container" hidden>
+        <div id="terminal-lab2"></div>
+      </article>
+
+      <article id="terminal-lab3-container" hidden>
+        <div id="terminal-lab3"></div>
+      </article>
+
+      <article id="terminal-lab4-container" hidden>
+        <div id="terminal-lab4"></div>
       </article>
 
       <br />
@@ -164,8 +175,8 @@
         </article>
       </details>
 
-      <button id="open">Apri connessione</button>
-      <button id="close">Chiudi connessione</button>
+      <!-- <button id="open">Apri connessione</button> -->
+      <!-- <button id="close">Chiudi connessione</button> -->
 
       <hr />
       <footer>Mehshell is released under GNU License</footer>
