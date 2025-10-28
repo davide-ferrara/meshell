@@ -10,6 +10,7 @@
       href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css"
     />
     <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-search@0.11.0/lib/xterm-addon-search.min.js"></script>
     <script src="./static/index.js" type="text/javascript" defer></script>
     <link
       rel="stylesheet"
@@ -45,17 +46,27 @@
             <li><strong>Meshell</strong></li>
           </ul>
           <ul>
-            <li><a href="#">About</a></li>
+            <li>
+              <a href="https://github.com/davide-ferrara/meshell">About</a>
+            </li>
           </ul>
         </nav>
       </header>
       <hr />
 
       <div role="group" id="tabs">
-        <button aria-current="true" id="terminal-lab1-tab">Lab 1</button>
-        <button id="terminal-lab2-tab">Lab 2</button>
-        <button id="terminal-lab3-tab">Lab 3</button>
-        <button id="terminal-lab4-tab">Lab 4</button>
+        <button aria-current="true" id="terminal-lab1-tab">
+          <span contenteditable="true">Lab 1</span>
+        </button>
+        <button id="terminal-lab2-tab">
+          <span contenteditable="true">Lab 2</span>
+        </button>
+        <button id="terminal-lab3-tab">
+          <span contenteditable="true">Lab 3</span>
+        </button>
+        <button id="terminal-lab4-tab">
+          <span contenteditable="true">Lab 4</span>
+        </button>
       </div>
 
       <article id="terminal-lab1-container">
@@ -76,180 +87,218 @@
 
       <br />
 
-      <details>
-        <summary role="button">Sistema</summary>
-        <article>
-          <div class="button-panel">
-            <button class="secondary" id="uptime">Uptime</button>
-            <button class="secondary" id="free">Utilizzo RAM</button>
-            <button class="secondary" id="ps">Processi</button>
-            <button class="secondary" id="idc">ID</button>
-            <button class="secondary" id="whoami">Whoami</button>
-            <button class="secondary" id="shutdown">Spegni</button>
-            <button class="secondary" id="reboot">Riavvia</button>
-            <button class="secondary advanced" id="uname -a">Info</button>
-            <button class="secondary advanced" id="ps-tree">
-              Albero processi
-            </button>
-            <button class="secondary advanced" id="top">TOP</button>
-            <button class="secondary advanced" id="kill">
-              Chiudi Processo
-            </button>
-            <button class="secondary advanced" id="groups">Gruppi</button>
-            <button class="secondary advanced" id="w">
-              Storico connessione
-            </button>
-            <button class="secondary advanced" id="last">Storico Login</button>
-            <button class="secondary advanced" id="aptu">
-              Aggiorna Sistema
-            </button>
-            <button class="secondary advanced" id="apti">
-              Installa Pacchetto
-            </button>
-            <button class="secondary advanced" id="aptq">
-              Cerca Pacchetto
-            </button>
-            <button class="secondary advanced" id="aptr">
-              Rimuovi Pacchetto
-            </button>
-          </div>
-        </article>
-      </details>
+      <div class="grid">
+        <div>
+          <button id="clear-terminal">Clear Terminal</button>
+        </div>
+        <div>
+          <button id="font-size-decrease">-</button>
+          <button id="font-size-increase">+</button>
+        </div>
+        <div>
+          <button id="toggle-advanced">Toggle Advanced</button>
+        </div>
+        <div>
+          <button id="scroll-top">Top</button>
+        </div>
+        <div>
+          <button id="scroll-bottom">Bottom</button>
+        </div>
 
-      <details>
-        <summary role="button">File System</summary>
-        <article>
-          <div class="button-panel">
-            <button class="secondary advanced" id="ls">Lista</button>
-            <button class="secondary advanced" id="mkdir">Crea</button>
-            <button class="secondary advanced" id="tree">Albero</button>
-            <button class="secondary advanced" id="ln">Link Simbolico</button>
-            <button class="secondary advanced" id="umask">Umask</button>
-            <button class="secondary advanced" id="chmod">Chmod</button>
-            <button class="secondary advanced" id="chown">
-              Cambia Proprietario
-            </button>
-            <button class="secondary advanced" id="chgpr">Cambia Gruppo</button>
-            <button class="secondary advanced" id="mknod">Crea nodo</button>
-            <button class="secondary advanced" id="mkfifo">Crea FIFO</button>
-            <button class="secondary advanced" id="lsatrr">
-              Lista attributi
-            </button>
-            <button class="secondary advanced" id="lsatrr">
-              Lista attributi
-            </button>
-          </div>
-        </article>
-      </details>
+        <div>
+          <button id="clear-search">Clear</button>
+        </div>
+        <div>
+          <button id="fullscreen">Fullscreen</button>
+        </div>
+        <div>
+          <button id="switch-theme">Switch Theme</button>
+        </div>
+      </div>
 
-      <details>
-        <summary role="button">Network</summary>
-        <article>
-          <div class="button-panel">
-            <button class="secondary advanced" id="ping">Ping</button>
-            <button class="secondary advanced" id="wget">Wget</button>
-            <button class="secondary advanced" id="curl">Curl</button>
-            <button class="secondary advanced" id="ip">
-              Interfacce di rete
-            </button>
-            <button class="secondary advanced" id="netcat">Netcat</button>
-            <button class="secondary advanced" id="portman">Portmap</button>
-            <button class="secondary advanced" id="dig">Dig</button>
-            <button class="secondary advanced" id="host">Host</button>
-            <button class="secondary advanced" id="nslookup">Nslookup</button>
-          </div>
-        </article>
-      </details>
+      <br />
 
-      <details>
-        <summary role="button">Shell</summary>
-        <article>
-          <div class="button-panel">
-            <button class="secondary advanced" id="which">Which</button>
-            <button class="secondary advanced" id="type">Type</button>
-            <button class="secondary advanced" id="alias">Alias</button>
-            <button class="secondary advanced" id="rmalias">
-              Rimuovi Alias
-            </button>
-          </div>
-        </article>
-      </details>
-
-      <!-- <button id="open">Apri connessione</button> -->
-      <!-- <button id="close">Chiudi connessione</button> -->
+      <div>
+        <details open>
+          <summary role="button">Sistema</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary" id="uptime">Uptime</button>
+              <button class="secondary" id="free">Utilizzo RAM</button>
+              <button class="secondary" id="ps">Processi</button>
+              <button class="secondary" id="id">ID</button>
+              <button class="secondary" id="whoami">Whoami</button>
+              <button class="secondary" id="shutdown">Spegni</button>
+              <button class="secondary" id="reboot">Riavvia</button>
+              <button class="secondary advanced" id="uname">Info</button>
+              <button class="secondary advanced" id="top">TOP</button>
+              <button class="secondary advanced" id="kill">
+                Chiudi Processo
+              </button>
+              <button class="secondary advanced" id="w">
+                Storico connessione
+              </button>
+              <button class="secondary advanced" id="last">
+                Storico Login
+              </button>
+              <button class="secondary advanced" id="history">History</button>
+              <button class="secondary advanced" id="date">Date</button>
+              <button class="secondary advanced" id="cal">Calendar</button>
+              <button class="secondary advanced" id="weather">Weather</button>
+              <button class="secondary advanced" id="du">Disk Usage</button>
+              <button class="secondary advanced" id="vm_stat">VM Stat</button>
+              <button class="secondary advanced" id="psu">
+                User Processes
+              </button>
+              <button class="secondary advanced" id="sar">
+                Resource Usage
+              </button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">File System</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="ls">Lista</button>
+              <button class="secondary advanced" id="mkdir">
+                Crea Directory
+              </button>
+              <button class="secondary advanced" id="touch">Crea File</button>
+              <button class="secondary advanced" id="tree">Albero</button>
+              <button class="secondary advanced" id="ln">Link Simbolico</button>
+              <button class="secondary advanced" id="umask">Umask</button>
+              <button class="secondary advanced" id="chmod">Chmod</button>
+              <button class="secondary advanced" id="chown">
+                Cambia Proprietario
+              </button>
+              <button class="secondary advanced" id="find">Find</button>
+              <button class="secondary advanced" id="file">File Type</button>
+            </div>
+          </article>
+        </details>
+      </div>
+      <div>
+        <details>
+          <summary role="button">Network</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="ping">Ping</button>
+              <button class="secondary advanced" id="wget">Wget</button>
+              <button class="secondary advanced" id="curl">Curl</button>
+              <button class="secondary advanced" id="ip">
+                Interfacce di rete
+              </button>
+              <button class="secondary advanced" id="netcat">Netcat</button>
+              <button class="secondary advanced" id="portmap">Portmap</button>
+              <button class="secondary advanced" id="dig">Dig</button>
+              <button class="secondary advanced" id="host">Host</button>
+              <button class="secondary advanced" id="nslookup">Nslookup</button>
+              <button class="secondary advanced" id="ifconfig">ifconfig</button>
+              <button class="secondary advanced" id="netstat">netstat</button>
+              <button class="secondary advanced" id="route">route</button>
+              <button class="secondary advanced" id="arp">arp</button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">Shell</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="which">Which</button>
+              <button class="secondary advanced" id="type">Type</button>
+              <button class="secondary advanced" id="alias">Alias</button>
+              <button class="secondary advanced" id="alias-remove">
+                Rimuovi Alias
+              </button>
+            </div>
+          </article>
+        </details>
+      </div>
+      <div>
+        <details>
+          <summary role="button">Package Management</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="update">Update</button>
+              <button class="secondary advanced" id="install">Install</button>
+              <button class="secondary advanced" id="search">Search</button>
+              <button class="secondary advanced" id="remove">Remove</button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">User Management</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="useradd">Add User</button>
+              <button class="secondary advanced" id="userdel">
+                Delete User
+              </button>
+              <button class="secondary advanced" id="groupadd">
+                Add Group
+              </button>
+              <button class="secondary advanced" id="groupdel">
+                Delete Group
+              </button>
+              <button class="secondary advanced" id="usermod">
+                Modify User
+              </button>
+            </div>
+          </article>
+        </details>
+      </div>
+      <div>
+        <details>
+          <summary role="button">Hardware</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="lshw">
+                Hardware Info
+              </button>
+              <button class="secondary advanced" id="lsblk">
+                Block Devices
+              </button>
+              <button class="secondary advanced" id="lspci">PCI Devices</button>
+              <button class="secondary advanced" id="lsusb">USB Devices</button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">Kernel</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="lsmod">
+                List Modules
+              </button>
+              <button class="secondary advanced" id="dmesg">
+                Kernel Messages
+              </button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">Systemd</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="systemctl">
+                Services
+              </button>
+              <button class="secondary advanced" id="timers">Timers</button>
+              <button class="secondary advanced" id="sockets">Sockets</button>
+              <button class="secondary advanced" id="targets">Targets</button>
+              <button class="secondary advanced" id="devices">Devices</button>
+              <button class="secondary advanced" id="mounts">Mounts</button>
+              <button class="secondary advanced" id="automounts">
+                Automounts
+              </button>
+            </div>
+          </article>
+        </details>
+      </div>
 
       <hr />
-      <footer>Mehshell is released under GNU License</footer>
+      <footer>Mehshell is released under MIT License.</footer>
     </main>
-    <!-- <div id="meshell-container"> -->
-    <!--   <button onclick="showTerminal('1')">Lab 1</button> -->
-    <!--   <button onclick="showTerminal('2')">Lab 2</button> -->
-    <!--   <div id="lab1"> -->
-    <!--     <div id="lab1-term"></div> -->
-    <!--     <p>Sistema</p> -->
-    <!--     <div id="system-cmd"> -->
-    <!--       <button id="uptime">Uptime</button> -->
-    <!--       <button id="uname -a">Info</button> -->
-    <!--       <button id="free">Utilizzo RAM</button> -->
-    <!--       <button id="ps">Processi</button> -->
-    <!--       <button id="ps-tree">Albero processi</button> -->
-    <!--       <button id="top">TOP</button> -->
-    <!--       <button id="kill">Chiudi Processo</button> -->
-    <!--       <button id="groups">Gruppi</button> -->
-    <!--       <button id="idc">ID</button> -->
-    <!--       <button id="w">Chi é connesso</button> -->
-    <!--       <button id="whoami">Chi sono</button> -->
-    <!--       <button id="last">Storico Login</button> -->
-    <!--       <button id="aptu">Aggiorna Sistema</button> -->
-    <!--       <button id="apti">Installa Pacchetto</button> -->
-    <!--       <button id="aptq">Cerca Pacchetto</button> -->
-    <!--       <button id="aptr">Rimuovi Pacchetto</button> -->
-    <!--       <button id="shutdown">Spegni</button> -->
-    <!--       <button id="reboot">Reboot</button> -->
-    <!--     </div> -->
-    <!--     <p>Cartelle</p> -->
-    <!--     <div id="system-files"> -->
-    <!--       <button id="ls">Lista</button> -->
-    <!--       <button id="mkdir">Crea</button> -->
-    <!--       <button id="tree">Albero</button> -->
-    <!--       <button id="ln">Link Simbolico</button> -->
-    <!--       <button id="umask">Umask</button> -->
-    <!--       <button id="chmod">Chmod</button> -->
-    <!--       <button id="chown">Cambia Proprietario</button> -->
-    <!--       <button id="chgpr">Cambia Gruppo</button> -->
-    <!--       <button id="mknod">Crea nodo</button> -->
-    <!--       <button id="mkfifo">Crea FIFO</button> -->
-    <!--       <button id="lsatrr">Lista attributi</button> -->
-    <!--       <button id="lsatrr">Lista attributi</button> -->
-    <!--     </div> -->
-    <!--     <p>Shell</p> -->
-    <!--     <div id="system-shell"> -->
-    <!--       <button id="which">Which</button> -->
-    <!--       <button id="type">Type</button> -->
-    <!--       <button id="alias">Alias</button> -->
-    <!--       <button id="rmalias">Rimuovi Alias</button> -->
-    <!--     </div> -->
-    <!--     <p>Rete</p> -->
-    <!--     <div id="system-net"> -->
-    <!--       <button id="ping">Ping</button> -->
-    <!--       <button id="wget">Wget</button> -->
-    <!--       <button id="curl">Curl</button> -->
-    <!--       <button id="ip">Interfacce di rete</button> -->
-    <!--       <button id="netcat">Netcat</button> -->
-    <!--       <button id="portman">Portmap</button> -->
-    <!--       <button id="dig">Dig</button> -->
-    <!--       <button id="host">Host</button> -->
-    <!--       <button id="nslookup">Nslookup</button> -->
-    <!--     </div> -->
-    <!--     <div id="controls"> -->
-    <!--       <button id="open">Apri connessione</button> -->
-    <!--       <button id="close">Chiudi connessione</button> -->
-    <!--     </div> -->
-    <!--   </div> -->
-    <!--   <div id="lab2" style="display: none;"> -->
-    <!--     <h1>INOP</h1> -->
-    <!--     <div id="lab2-term"></div> -->
-    <!--   </div> -->
-    <!-- </div> -->
   </body>
 </html>
