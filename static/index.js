@@ -1,78 +1,104 @@
-function showTerminal(n) {
-  const ids = new Array("lab1", "lab2");
-  const selected = "lab" + n;
+class Meshell {
+  constructor(tname) {
+    this.tname = tname;
+    this.tabId = this.tname + "-tab";
+    this.tab = null;
+    this.ws = null;
+    this.term = null;
+  }
 
-  ids.forEach((id) => {
-    curr = document.getElementById(id);
-    if (id === selected) {
-      curr.style.display = "block";
+  initXterm() {
+    this.term = new Terminal({
+      cursorBlink: true,
+      fontSize: 14,
+      fontFamily: "monospace",
+      theme: { background: "#181C25", foreground: "#FFFFFF" },
+    });
+    this.term.open(document.getElementById(this.tname));
+    this.term.writeln(`This is ${this.tname}`);
+
+    this.tab = document.getElementById(this.tabId);
+    this.tab.onclick = () => tabsHandler(this.tabId);
+  }
+
+  openConnection() {
+    if (this.ws) {
+      this.term.writeln("\r\nConnessione già aperta.");
+      return;
+    }
+
+    this.ws = new WebSocket("ws://localhost:8080/tty");
+
+    this.ws.binaryType = "arraybuffer";
+
+    this.ws.onopen = () => {
+      this.term.writeln("\r\nWebsocket aperto.");
+      this.term.focus();
+
+      // Invia ogni input dell’utente direttamente al server
+      this.term.onData(function (data) {
+        // console.log(data);
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(data);
+        }
+      });
+    };
+
+    this.ws.onmessage = (event) => {
+      // Scrive tutto ciò che arriva dal server nel terminale
+      this.term.write(event.data);
+    };
+
+    this.ws.onerror = () => {
+      this.term.writeln("\r\nErrore WebSocket.");
+    };
+
+    this.ws.onclose = () => {
+      this.term.writeln("\r\nConnessione chiusa.");
+      this.ws = null;
+    };
+  }
+
+  closeConnection() {
+    if (this.ws) {
+      this.ws.close();
+      this.ws = null;
     } else {
-      curr.style.display = "none";
+      this.term.writeln("\r\nNessuna connessione aperta.");
+    }
+  }
+}
+
+function tabsHandler(tabId) {
+  const tabs = document.querySelectorAll("#tabs > button");
+
+  tabs.forEach((button) => {
+    const container = document.getElementById(
+      button.id.replace("tab", "container"),
+    );
+
+    if (button.id === tabId) {
+      button.ariaCurrent = true;
+      container.hidden = false;
+    } else {
+      button.ariaCurrent = false;
+      container.hidden = true;
     }
   });
 }
 
-// --- Inizializza terminale ---
-const term = new Terminal({
-  cursorBlink: true,
-  fontSize: 14,
-  fontFamily: "monospace",
-  theme: { background: "#181C25", foreground: "#FFFFFF" },
+labs = new Array();
+lab1 = new Meshell("terminal-lab1");
+lab2 = new Meshell("terminal-lab2");
+lab3 = new Meshell("terminal-lab3");
+lab4 = new Meshell("terminal-lab4");
+
+labs.push(lab1);
+labs.push(lab2);
+labs.push(lab3);
+labs.push(lab4);
+
+labs.forEach((lab) => {
+  lab.initXterm();
+  lab.openConnection();
 });
-term.open(document.getElementById("terminal-lab1"));
-term.writeln('Premi "Apri connessione" per iniziare...');
-
-let ws = null;
-
-function openConnection() {
-  if (ws) {
-    term.writeln("\r\n⚠️ Connessione già aperta.");
-    return;
-  }
-
-  ws = new WebSocket("ws://localhost:8080/tty");
-
-  ws.binaryType = "arraybuffer";
-
-  ws.onopen = function () {
-    term.writeln("\r\n🔌 Connessione aperta.");
-    term.focus();
-
-    // Invia ogni input dell’utente direttamente al server
-    term.onData(function (data) {
-      console.log(data);
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(data);
-      }
-    });
-  };
-
-  ws.onmessage = function (event) {
-    // Scrive tutto ciò che arriva dal server nel terminale
-    term.write(event.data);
-  };
-
-  ws.onerror = function () {
-    term.writeln("\r\n❌ Errore WebSocket.");
-  };
-
-  ws.onclose = function () {
-    term.writeln("\r\n🔒 Connessione chiusa.");
-    ws = null;
-  };
-}
-
-function closeConnection() {
-  if (ws) {
-    ws.close();
-    ws = null;
-  } else {
-    term.writeln("\r\n⚠️ Nessuna connessione aperta.");
-  }
-}
-
-document.getElementById("open").onclick = openConnection;
-document.getElementById("close").onclick = closeConnection;
-
-// Mantieni focus sul terminale se clicchi dentro
-term.element.addEventListener("click", () => term.focus());
