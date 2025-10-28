@@ -1,0 +1,8 @@
+.git
+.gitignore
+Dockerfile
+README.md
+meshell.sh
+cmds.txt
+install.sh
+uninstall.sh
