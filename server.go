@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
@@ -126,7 +127,7 @@ type websocketWriter struct {
 }
 
 func (w *websocketWriter) Write(p []byte) (n int, err error) {
-	err = w.ws.WriteMessage(websocket.TextMessage, p)
+	err = w.ws.WriteMessage(websocket.BinaryMessage, p)
 	if err != nil {
 		return 0, err
 	}
@@ -154,16 +155,24 @@ func startPiping(ws *websocket.Conn, sshStdin io.WriteCloser, sshStdout, sshStde
 		defer wg.Done()
 		defer sshStdin.Close()
 		for {
-			mt, p, err := ws.ReadMessage()
+			_, p, err := ws.ReadMessage()
 			if err != nil {
 				log.Println("WebSocket input stream closed/error:", err)
 				return
 			}
-			if mt == websocket.TextMessage {
-				if _, err := sshStdin.Write(p); err != nil {
-					log.Println("SSH Stdin write error:", err)
-					return
+
+			var msg map[string]interface{}
+			if err := json.Unmarshal(p, &msg); err == nil && msg["type"] == "resize" {
+				cols := int(msg["cols"].(float64))
+				rows := int(msg["rows"].(float64))
+				if err := sshSession.WindowChange(rows, cols); err != nil {
+					log.Println("SSH window change error:", err)
 				}
+				continue
+			}
+			if _, err := sshStdin.Write(p); err != nil {
+				log.Println("SSH Stdin write error:", err)
+				return
 			}
 		}
 	}()
@@ -248,6 +257,7 @@ func main() {
 
 	http.HandleFunc("/tty", tty)
 	http.HandleFunc("/", home)
+	http.Handle("/node_modules/", http.StripPrefix("/node_modules/", http.FileServer(http.Dir("node_modules"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
 	err := http.ListenAndServe(*addr, nil)

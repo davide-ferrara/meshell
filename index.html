@@ -4,37 +4,22 @@
     <meta charset="utf-8" />
     <title>Meshell Web SSH Terminal</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/xterm@5.3.0/css/xterm.min.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/xterm@5.3.0/lib/xterm.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-search@0.11.0/lib/xterm-addon-search.min.js"></script>
-    <script src="./static/index.js" type="text/javascript" defer></script>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.colors.min.css"
-    />
-    <link rel="stylesheet" href="./static/style.css" />
+    <script type="module" src="./static/index.js"></script>
+    <link rel="stylesheet" href="/static/style.css" />
     <link
       rel="icon"
       type="image/png"
-      href="./static/favicon/favicon-96x96.png"
+      href="static/favicon/favicon-96x96.png"
       sizes="96x96"
     />
-    <link rel="icon" type="image/svg+xml" href="./static/favicon/favicon.svg" />
-    <link rel="shortcut icon" href="./static/favicon/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="static/favicon/favicon.svg" />
+    <link rel="shortcut icon" href="static/favicon/favicon.ico" />
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="./static/favicon/apple-touch-icon.png"
+      href="static/favicon/apple-touch-icon.png"
     />
-    <link rel="manifest" href="./static/favicon/site.webmanifest" />
+    <link rel="manifest" href="static/favicon/site.webmanifest" />
   </head>
 
   <body>
@@ -42,7 +27,7 @@
       <header>
         <nav>
           <ul>
-            <img src="./static/logo.png" class="logo" />
+            <img src="static/logo.png" class="logo" />
             <li><strong>Meshell</strong></li>
           </ul>
           <ul>
@@ -69,8 +54,8 @@
         </button>
       </div>
 
-      <article id="terminal-lab1-container">
-        <div id="terminal-lab1"></div>
+      <article id="terminal-lab1-container" class="terminal-container">
+        <div id="terminal-lab1" class="terminal"></div>
       </article>
 
       <article id="terminal-lab2-container" hidden>
@@ -87,51 +72,43 @@
 
       <br />
 
-      <div class="grid">
-        <div>
-          <button id="clear-terminal">Clear Terminal</button>
-        </div>
-        <div>
-          <button id="font-size-decrease">-</button>
-          <button id="font-size-increase">+</button>
-        </div>
-        <div>
-          <button id="toggle-advanced">Toggle Advanced</button>
-        </div>
-        <div>
-          <button id="scroll-top">Top</button>
-        </div>
-        <div>
-          <button id="scroll-bottom">Bottom</button>
-        </div>
-
-        <div>
-          <button id="clear-search">Clear</button>
-        </div>
-        <div>
-          <button id="fullscreen">Fullscreen</button>
-        </div>
-        <div>
-          <button id="switch-theme">Switch Theme</button>
-        </div>
+      <div class="grid button-panel">
+        <button class="secondary" id="clear-terminal">Clear Terminal</button>
+        <button class="secondary" id="cd">Change Dir</button>
+        <button class="secondary" id="cdback">..</button>
+        <button class="secondary" id="pwd">Print Work Dir</button>
+        <!-- <button class="secondary" id="scroll-top">Top</button> -->
+        <!-- <button class="secondary" id="scroll-bottom">Bottom</button> -->
+        <button class="secondary" id="font-size-decrease">-</button>
+        <button class="secondary" id="font-size-increase">+</button>
+        <button class="secondary" id="meshell-update">Meshell Update</button>
       </div>
 
       <br />
 
       <div>
-        <details open>
+        <details>
+          <summary role="button">Package Management</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="update">Update</button>
+              <button class="secondary advanced" id="install">Install</button>
+              <button class="secondary advanced" id="search">Search</button>
+              <button class="secondary advanced" id="remove">Remove</button>
+            </div>
+          </article>
+        </details>
+        <details>
           <summary role="button">Sistema</summary>
           <article>
             <div class="button-panel">
+              <button class="secondary" id="whoami">Whoami</button>
+              <button class="secondary" id="id">ID</button>
+              <button class="secondary advanced" id="uname">Uname</button>
               <button class="secondary" id="uptime">Uptime</button>
               <button class="secondary" id="free">Utilizzo RAM</button>
-              <button class="secondary" id="ps">Processi</button>
-              <button class="secondary" id="id">ID</button>
-              <button class="secondary" id="whoami">Whoami</button>
-              <button class="secondary" id="shutdown">Spegni</button>
-              <button class="secondary" id="reboot">Riavvia</button>
-              <button class="secondary advanced" id="uname">Info</button>
               <button class="secondary advanced" id="top">TOP</button>
+              <button class="secondary" id="ps">Processi</button>
               <button class="secondary advanced" id="kill">
                 Chiudi Processo
               </button>
@@ -141,18 +118,15 @@
               <button class="secondary advanced" id="last">
                 Storico Login
               </button>
-              <button class="secondary advanced" id="history">History</button>
-              <button class="secondary advanced" id="date">Date</button>
-              <button class="secondary advanced" id="cal">Calendar</button>
-              <button class="secondary advanced" id="weather">Weather</button>
+              <!-- <button class="secondary advanced" id="date">Date</button> -->
+              <!-- <button class="secondary advanced" id="cal">Calendar</button> -->
+              <!-- <button class="secondary advanced" id="weather">Weather</button> -->
               <button class="secondary advanced" id="du">Disk Usage</button>
-              <button class="secondary advanced" id="vm_stat">VM Stat</button>
               <button class="secondary advanced" id="psu">
                 User Processes
               </button>
-              <button class="secondary advanced" id="sar">
-                Resource Usage
-              </button>
+              <button class="secondary" id="shutdown">Spegni</button>
+              <button class="secondary" id="reboot">Riavvia</button>
             </div>
           </article>
         </details>
@@ -161,11 +135,12 @@
           <article>
             <div class="button-panel">
               <button class="secondary advanced" id="ls">Lista</button>
+              <button class="secondary advanced" id="inode">Inode</button>
               <button class="secondary advanced" id="mkdir">
                 Crea Directory
               </button>
               <button class="secondary advanced" id="touch">Crea File</button>
-              <button class="secondary advanced" id="tree">Albero</button>
+              <button class="secondary advanced" id="tree">Tree</button>
               <button class="secondary advanced" id="ln">Link Simbolico</button>
               <button class="secondary advanced" id="umask">Umask</button>
               <button class="secondary advanced" id="chmod">Chmod</button>
@@ -174,6 +149,28 @@
               </button>
               <button class="secondary advanced" id="find">Find</button>
               <button class="secondary advanced" id="file">File Type</button>
+            </div>
+          </article>
+        </details>
+      </div>
+      <div>
+        <details>
+          <summary role="button">User Management</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="useradd">Add User</button>
+              <button class="secondary advanced" id="userdel">
+                Delete User
+              </button>
+              <button class="secondary advanced" id="groupadd">
+                Add Group
+              </button>
+              <button class="secondary advanced" id="groupdel">
+                Delete Group
+              </button>
+              <button class="secondary advanced" id="usermod">
+                Modify User
+              </button>
             </div>
           </article>
         </details>
@@ -194,10 +191,10 @@
               <button class="secondary advanced" id="dig">Dig</button>
               <button class="secondary advanced" id="host">Host</button>
               <button class="secondary advanced" id="nslookup">Nslookup</button>
-              <button class="secondary advanced" id="ifconfig">ifconfig</button>
-              <button class="secondary advanced" id="netstat">netstat</button>
-              <button class="secondary advanced" id="route">route</button>
-              <button class="secondary advanced" id="arp">arp</button>
+              <button class="secondary advanced" id="ifconfig">Ifconfig</button>
+              <button class="secondary advanced" id="netstat">Netstat</button>
+              <button class="secondary advanced" id="route">Route</button>
+              <button class="secondary advanced" id="arp">Arp</button>
             </div>
           </article>
         </details>
@@ -205,45 +202,16 @@
           <summary role="button">Shell</summary>
           <article>
             <div class="button-panel">
+              <button class="secondary advanced" id="history">History</button>
               <button class="secondary advanced" id="which">Which</button>
               <button class="secondary advanced" id="type">Type</button>
               <button class="secondary advanced" id="alias">Alias</button>
               <button class="secondary advanced" id="alias-remove">
                 Rimuovi Alias
               </button>
-            </div>
-          </article>
-        </details>
-      </div>
-      <div>
-        <details>
-          <summary role="button">Package Management</summary>
-          <article>
-            <div class="button-panel">
-              <button class="secondary advanced" id="update">Update</button>
-              <button class="secondary advanced" id="install">Install</button>
-              <button class="secondary advanced" id="search">Search</button>
-              <button class="secondary advanced" id="remove">Remove</button>
-            </div>
-          </article>
-        </details>
-        <details>
-          <summary role="button">User Management</summary>
-          <article>
-            <div class="button-panel">
-              <button class="secondary advanced" id="useradd">Add User</button>
-              <button class="secondary advanced" id="userdel">
-                Delete User
-              </button>
-              <button class="secondary advanced" id="groupadd">
-                Add Group
-              </button>
-              <button class="secondary advanced" id="groupdel">
-                Delete Group
-              </button>
-              <button class="secondary advanced" id="usermod">
-                Modify User
-              </button>
+              <button class="secondary advanced" id="shell-var0">$?</button>
+              <button class="secondary advanced" id="shell-var1">$1</button>
+              <button class="secondary advanced" id="shell-var2">$2</button>
             </div>
           </article>
         </details>

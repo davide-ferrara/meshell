@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <title>Meshell Web SSH Terminal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="node_modules/@xterm/xterm/css/xterm.css" />
+    <link rel="stylesheet" href="css/pico.min.css" />
+    <script src="node_modules/@xterm/xterm/lib/xterm.js"></script>
+    <link
+      rel="icon"
+      type="image/png"
+      href="/assets/favicon-96x96-D9xv08vh.png"
+      sizes="96x96"
+    />
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon-DU7okUaf.svg" />
+    <link rel="shortcut icon" href="/assets/favicon-BYn2ziNw.ico" />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/apple-touch-icon-Dp6m_5jr.png"
+    />
+    <link rel="manifest" href="/assets/site-DGWt2i2_.webmanifest" />
+    <script type="module" crossorigin src="/assets/index-C073KUr1.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D3X-A0Nw.css">
+  </head>
+
+  <body>
+    <main class="container-fluid">
+      <header>
+        <nav>
+          <ul>
+            <img src="/assets/logo-_utWI_SD.png" class="logo" />
+            <li><strong>Meshell</strong></li>
+          </ul>
+          <ul>
+            <li>
+              <a href="https://github.com/davide-ferrara/meshell">About</a>
+            </li>
+          </ul>
+        </nav>
+      </header>
+      <hr />
+
+      <div role="group" id="tabs">
+        <button aria-current="true" id="terminal-lab1-tab">
+          <span contenteditable="true">Lab 1</span>
+        </button>
+        <button id="terminal-lab2-tab">
+          <span contenteditable="true">Lab 2</span>
+        </button>
+        <button id="terminal-lab3-tab">
+          <span contenteditable="true">Lab 3</span>
+        </button>
+        <button id="terminal-lab4-tab">
+          <span contenteditable="true">Lab 4</span>
+        </button>
+      </div>
+
+      <article id="terminal-lab1-container" class="terminal-container">
+        <div id="terminal-lab1" class="terminal"></div>
+      </article>
+
+      <article id="terminal-lab2-container" hidden>
+        <div id="terminal-lab2"></div>
+      </article>
+
+      <article id="terminal-lab3-container" hidden>
+        <div id="terminal-lab3"></div>
+      </article>
+
+      <article id="terminal-lab4-container" hidden>
+        <div id="terminal-lab4"></div>
+      </article>
+
+      <br />
+
+      <div class="grid">
+        <div>
+          <button id="clear-terminal">Clear Terminal</button>
+        </div>
+        <div>
+          <button id="font-size-decrease">-</button>
+          <button id="font-size-increase">+</button>
+        </div>
+        <div>
+          <button id="toggle-advanced">Toggle Advanced</button>
+        </div>
+        <div>
+          <button id="scroll-top">Top</button>
+        </div>
+        <div>
+          <button id="scroll-bottom">Bottom</button>
+        </div>
+
+        <div>
+          <button id="clear-search">Clear</button>
+        </div>
+        <div>
+          <button id="fullscreen">Fullscreen</button>
+        </div>
+        <div>
+          <button id="switch-theme">Switch Theme</button>
+        </div>
+      </div>
+
+      <br />
+
+      <div>
+        <details open>
+          <summary role="button">Sistema</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary" id="uptime">Uptime</button>
+              <button class="secondary" id="free">Utilizzo RAM</button>
+              <button class="secondary" id="ps">Processi</button>
+              <button class="secondary" id="id">ID</button>
+              <button class="secondary" id="whoami">Whoami</button>
+              <button class="secondary" id="shutdown">Spegni</button>
+              <button class="secondary" id="reboot">Riavvia</button>
+              <button class="secondary advanced" id="uname">Info</button>
+              <button class="secondary advanced" id="top">TOP</button>
+              <button class="secondary advanced" id="kill">
+                Chiudi Processo
+              </button>
+              <button class="secondary advanced" id="w">
+                Storico connessione
+              </button>
+              <button class="secondary advanced" id="last">
+                Storico Login
+              </button>
+              <button class="secondary advanced" id="history">History</button>
+              <button class="secondary advanced" id="date">Date</button>
+              <button class="secondary advanced" id="cal">Calendar</button>
+              <button class="secondary advanced" id="weather">Weather</button>
+              <button class="secondary advanced" id="du">Disk Usage</button>
+              <button class="secondary advanced" id="vm_stat">VM Stat</button>
+              <button class="secondary advanced" id="psu">
+                User Processes
+              </button>
+              <button class="secondary advanced" id="sar">
+                Resource Usage
+              </button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">File System</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="ls">Lista</button>
+              <button class="secondary advanced" id="mkdir">
+                Crea Directory
+              </button>
+              <button class="secondary advanced" id="touch">Crea File</button>
+              <button class="secondary advanced" id="tree">Albero</button>
+              <button class="secondary advanced" id="ln">Link Simbolico</button>
+              <button class="secondary advanced" id="umask">Umask</button>
+              <button class="secondary advanced" id="chmod">Chmod</button>
+              <button class="secondary advanced" id="chown">
+                Cambia Proprietario
+              </button>
+              <button class="secondary advanced" id="find">Find</button>
+              <button class="secondary advanced" id="file">File Type</button>
+            </div>
+          </article>
+        </details>
+      </div>
+      <div>
+        <details>
+          <summary role="button">Network</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="ping">Ping</button>
+              <button class="secondary advanced" id="wget">Wget</button>
+              <button class="secondary advanced" id="curl">Curl</button>
+              <button class="secondary advanced" id="ip">
+                Interfacce di rete
+              </button>
+              <button class="secondary advanced" id="netcat">Netcat</button>
+              <button class="secondary advanced" id="portmap">Portmap</button>
+              <button class="secondary advanced" id="dig">Dig</button>
+              <button class="secondary advanced" id="host">Host</button>
+              <button class="secondary advanced" id="nslookup">Nslookup</button>
+              <button class="secondary advanced" id="ifconfig">ifconfig</button>
+              <button class="secondary advanced" id="netstat">netstat</button>
+              <button class="secondary advanced" id="route">route</button>
+              <button class="secondary advanced" id="arp">arp</button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">Shell</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="which">Which</button>
+              <button class="secondary advanced" id="type">Type</button>
+              <button class="secondary advanced" id="alias">Alias</button>
+              <button class="secondary advanced" id="alias-remove">
+                Rimuovi Alias
+              </button>
+            </div>
+          </article>
+        </details>
+      </div>
+      <div>
+        <details>
+          <summary role="button">Package Management</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="update">Update</button>
+              <button class="secondary advanced" id="install">Install</button>
+              <button class="secondary advanced" id="search">Search</button>
+              <button class="secondary advanced" id="remove">Remove</button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">User Management</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="useradd">Add User</button>
+              <button class="secondary advanced" id="userdel">
+                Delete User
+              </button>
+              <button class="secondary advanced" id="groupadd">
+                Add Group
+              </button>
+              <button class="secondary advanced" id="groupdel">
+                Delete Group
+              </button>
+              <button class="secondary advanced" id="usermod">
+                Modify User
+              </button>
+            </div>
+          </article>
+        </details>
+      </div>
+      <div>
+        <details>
+          <summary role="button">Hardware</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="lshw">
+                Hardware Info
+              </button>
+              <button class="secondary advanced" id="lsblk">
+                Block Devices
+              </button>
+              <button class="secondary advanced" id="lspci">PCI Devices</button>
+              <button class="secondary advanced" id="lsusb">USB Devices</button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">Kernel</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="lsmod">
+                List Modules
+              </button>
+              <button class="secondary advanced" id="dmesg">
+                Kernel Messages
+              </button>
+            </div>
+          </article>
+        </details>
+        <details>
+          <summary role="button">Systemd</summary>
+          <article>
+            <div class="button-panel">
+              <button class="secondary advanced" id="systemctl">
+                Services
+              </button>
+              <button class="secondary advanced" id="timers">Timers</button>
+              <button class="secondary advanced" id="sockets">Sockets</button>
+              <button class="secondary advanced" id="targets">Targets</button>
+              <button class="secondary advanced" id="devices">Devices</button>
+              <button class="secondary advanced" id="mounts">Mounts</button>
+              <button class="secondary advanced" id="automounts">
+                Automounts
+              </button>
+            </div>
+          </article>
+        </details>
+      </div>
+
+      <hr />
+      <footer>Mehshell is released under MIT License.</footer>
+    </main>
+  </body>
+</html>

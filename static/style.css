@@ -1,3 +1,8 @@
+html {
+  font-size: 87.5%;
+  font-weight: bold;
+}
+
 .button-panel {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -12,5 +17,16 @@
 
 .logo {
   max-width: 100%;
-  height: 100px;
+  height: 50px;
+}
+
+.terminal-container {
+  width: auto;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0;
+  .terminal {
+    padding: 5px;
+    height: calc(100% - 10px);
+  }
 }

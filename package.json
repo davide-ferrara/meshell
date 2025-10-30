@@ -1,0 +1,32 @@
+{
+  "name": "meshell",
+  "version": "1.0.0",
+  "description": "Meshell is a web panel that allows you to interact whith the Terminal with ease.",
+  "homepage": "https://github.com/davide-ferrara/meshell#readme",
+  "bugs": {
+    "url": "https://github.com/davide-ferrara/meshell/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davide-ferrara/meshell.git"
+  },
+  "license": "MIT",
+  "author": "Davide Ferrara",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "go run server.go",
+    "dev": "concurrently \"go run server.go\" \"wait-on http://localhost:8080 && vite\"",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@picocss/pico": "^2.1.1",
+    "xterm": "^5.3.0",
+    "xterm-addon-fit": "^0.8.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "vite": "^7.1.12",
+    "wait-on": "^9.0.1"
+  }
+}

@@ -111,6 +111,7 @@ The project consists of two main components:
 ### Prerequisites
 
 *   [Go](https://golang.org/doc/install)
+*   [Node.js and npm](https://nodejs.org/en/download/)
 *   [VirtualBox](https://www.virtualbox.org/wiki/Downloads) (for VM management)
 *   A modern web browser
 
@@ -129,7 +130,13 @@ The project consists of two main components:
     go mod tidy
     ```
 
-3.  **Make the `meshell.sh` script executable:**
+3.  **Install npm dependencies:**
+
+    ```bash
+    npm install
+    ```
+
+4.  **Make the `meshell.sh` script executable:**
 
     ```bash
     chmod +x meshell.sh
@@ -144,7 +151,7 @@ The project consists of two main components:
 1.  **Start the web server:**
 
     ```bash
-    go run server.go
+    npm start
     ```
 
 2.  **Open your web browser and navigate to `http://localhost:8080`.**

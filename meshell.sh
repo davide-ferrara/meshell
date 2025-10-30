@@ -63,9 +63,19 @@ case "$1" in
 
   "--cmd")
     case $2 in
+      "meshell-update")
+        echo "Aggiornado Meshell"
+        cd /usr/share/meshell/
+        git pull
+        cd
+        ;; 
       "ls")
         echo "Eseguendo 'ls -la': Elenca i file e le directory con i dettagli."
         ls -la
+        ;; 
+      "inode")
+        echo "Eseguendo 'ls -ll': Elenca i file e le directory con i dettagli e gli inode."
+        ls -li
         ;; 
       "uptime")
         echo "Eseguendo 'uptime -p': Mostra da quanto tempo il sistema è attivo."
@@ -119,7 +129,7 @@ case "$1" in
         ;; 
       "update")
         echo "Eseguendo 'sudo apt update && sudo apt upgrade': Aggiorna l\'elenco dei pacchetti e aggiorna i pacchetti installati."
-        sudo apt update && sudo apt upgrade
+        sudo apt update && sudo apt -y upgrade
         ;; 
       "install")
         echo -n "Inserisci il nome del pacchetto da installare: "
