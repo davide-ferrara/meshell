@@ -3,11 +3,10 @@
 echo "Questo linkerá lab.sh in /bin per renderlo eseguibile..."
 
 origin="$(pwd)/meshell.sh"
-dest="/bin/meshell"
+dest="/usr/local/bin/meshell"
 
 sudo ln -sf "$origin" "$dest"
-cd scripts/
-mv bin/* /bin
+sudo mv bin/* /usr/local/bin
 
 echo "meshell é stato installato!"
 echo "Esegui meshell --h per visualizzare i comandi."
