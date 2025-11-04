@@ -49,6 +49,7 @@ func main() {
 	for {
 		_, err := fmt.Scanln(&n)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error scanning input: %s\n", err) // Added logging
 			fmt.Fprintf(os.Stderr, "Input non valido, inserisci un numero tra 0 e %d\n", maxChoice)
 			continue
 		}
