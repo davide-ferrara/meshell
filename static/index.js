@@ -147,6 +147,10 @@ function setupCommandButtons() {
       if (!blacklist.includes(command)) {
         const activeTerminal = getActiveTerminal();
         if (activeTerminal) {
+          if (button.id === "cd") {
+            // Important to use source or the script will be executed in a child process
+            activeTerminal.sendCommand(`source meshell --cmd ${command}`);
+          }
           activeTerminal.sendCommand(`meshell --cmd ${command}`);
           scrollToTop();
         }

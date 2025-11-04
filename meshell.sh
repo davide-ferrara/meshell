@@ -69,6 +69,10 @@ case "$1" in
         git pull
         cd
         ;; 
+      "cd")
+        echo "Eseguendo 'cd': Permette di cambiare directory"
+        cd $(meshell_list_dirs)
+        ;; 
       "ls")
         echo "Eseguendo 'ls -la': Elenca i file e le directory con i dettagli."
         ls -la
