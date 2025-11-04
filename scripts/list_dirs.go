@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 )
 
 func buildDirs(entries []os.DirEntry) []string {
@@ -46,21 +48,34 @@ func main() {
 	listDirs(dirs)
 
 	fmt.Fprintf(os.Stderr, "Seleziona una cartella:")
-	for {
-		_, err := fmt.Scanln(&n)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error scanning input: %s\n", err) // Added logging
-			fmt.Fprintf(os.Stderr, "Input non valido, inserisci un numero tra 0 e %d\n", maxChoice)
-			continue
-		}
 
-		if n >= 0 && n <= maxChoice {
-			choice = dirs[n]
-			// This confirmation message can be removed for a "silent" tool
-			fmt.Fprintf(os.Stderr, "Ok, mi sposto nella directory: %s\n", choice)
-			break
-		} else {
-			fmt.Fprintf(os.Stderr, "Valore fuori dal range. Puoi scegliere da 0 a %d\n", maxChoice)
+	// Open /dev/tty for reading
+	tty, err := os.OpenFile("/dev/tty", os.O_RDONLY, 0)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to open /dev/tty: %v\n", err)
+		os.Exit(1)
+	}
+	defer tty.Close()
+
+	scanner := bufio.NewScanner(tty)
+
+	for {
+		if scanner.Scan() {
+			input := scanner.Text()
+			n, err = strconv.Atoi(input)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "Input non valido, inserisci un numero tra 0 e %d\n", maxChoice)
+				continue
+			}
+
+			if n >= 0 && n <= maxChoice {
+				choice = dirs[n]
+				// This confirmation message can be removed for a "silent" tool
+				fmt.Fprintf(os.Stderr, "Ok, mi sposto nella directory: %s\n", choice)
+				break
+			} else {
+				fmt.Fprintf(os.Stderr, "Valore fuori dal range. Puoi scegliere da 0 a %d\n", maxChoice)
+			}
 		}
 	}
 	fmt.Printf("%s", choice)
