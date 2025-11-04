@@ -7,10 +7,7 @@ all: meshell_list_dirs
 meshell_list_dirs:
 	@echo "Building $(BINARY_NAME)..."
 	go build -o $(BINARY_NAME) $(SRC)
-
-install: meshell_list_dirs
-	@echo "Installing $(BINARY_NAME) to /bin..."
-	sudo mv $(BINARY_NAME) /bin/$(BINARY_NAME)
+	mv $(BINARY_NAME) ../bin
 
 clean:
 	@echo "Cleaning..."
