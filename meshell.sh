@@ -73,6 +73,9 @@ case "$1" in
         echo "Eseguendo 'cd': Permette di cambiare directory"
         cd $(meshell_list_dirs)
         ;; 
+      "cdback")
+        cd .. 
+        ;; 
       "ls")
         echo "Eseguendo 'ls -la': Elenca i file e le directory con i dettagli."
         ls -la
