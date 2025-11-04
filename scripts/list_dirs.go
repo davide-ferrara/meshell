@@ -47,11 +47,9 @@ func main() {
 
 	fmt.Fprintf(os.Stderr, "Seleziona una cartella:")
 	for {
-		_, err := fmt.Scan(&n)
+		_, err := fmt.Scanln(&n)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Input non valido, inserisci un numero tra 1 e %d\n", maxChoice)
-			var discard string
-			fmt.Scanln(&discard)
+			fmt.Fprintf(os.Stderr, "Input non valido, inserisci un numero tra 0 e %d\n", maxChoice)
 			continue
 		}
 
