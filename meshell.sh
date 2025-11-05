@@ -89,6 +89,10 @@ case "$1" in
         echo "Eseguendo 'ls -ll': Elenca i file e le directory con i dettagli e gli inode."
         ls -li
         ;; 
+      "pwd")
+        echo "Eseguendo 'pwd': Mostra la working directory."
+        pwd
+        ;; 
       "uptime")
         echo "Eseguendo 'uptime -p': Mostra da quanto tempo il sistema è attivo."
         uptime -p
