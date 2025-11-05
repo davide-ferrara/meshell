@@ -67,11 +67,10 @@ case "$1" in
         echo "Aggiornado Meshell"
         cd /usr/share/meshell/
         git pull
-        cd
         ;; 
       "cd")
         echo "Eseguendo 'cd': Permette di cambiare directory"
-        cd $(meshell_list_dirs)
+        cd $(meshell_list_dirs) >> /dev/null
         ;; 
       "cdback")
         cd ..
@@ -220,8 +219,8 @@ case "$1" in
         curl $url
         ;; 
       "ip")
-        echo "Eseguendo 'ip -a': Mostra le informazioni sull\'interfaccia di rete."
-        ip -a
+        echo "Eseguendo 'ip a': Mostra le informazioni sull\'interfaccia di rete."
+        ip a
         ;; 
       "netcat")
         echo -n "Inserisci l\'host a cui connettersi: "
