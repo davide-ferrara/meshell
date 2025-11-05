@@ -105,8 +105,13 @@ case "$1" in
         echo "Eseguendo 'ps aux --forest': Mostra i processi in esecuzione in una struttura ad albero."
         ps aux --forest
         ;; 
+      "searchps")
+        echo "Eseguendo 'ps aux | grep \$name': Mostra i processi con quel nome."
+        read -p "Nome del processo da cercare: " psname
+        ps aux | grep $psname
+        ;; 
       "w")
-        echo "Eseguendo 'w': Mostra chi è loggato e cosa sta facendo."
+        echo "Eseguendo 'w': Mostra chi è loggato."
         w
         ;; 
       "last")
@@ -151,7 +156,7 @@ case "$1" in
         echo -n "Inserisci il nome del pacchetto da installare: "
         read package
         echo "Eseguendo 'sudo apt install $package': Installa il pacchetto specificato."
-        sudo apt install $package
+        sudo apt install -y $package
         ;; 
       "search")
 
