@@ -178,8 +178,13 @@ case "$1" in
         touch $filename
         ;; 
       "tree")
-        echo "Eseguendo 'tree': Mostra la struttura delle directory ad albero."
-        tree
+        echo "Eseguendo 'tree -L \$n': Mostra la struttura delle directory ad albero."
+        read -p "Fino a che livello vuoi scendere? " n
+        echo $n
+        if [[ -z "$n" ]]; then
+          tree -L 1
+        fi
+        tree -L $n
         ;; 
       "ln")
         echo -n "Inserisci il percorso di destinazione: "
@@ -194,12 +199,47 @@ case "$1" in
         umask
         ;; 
       "chmod")
+        echo "Guida rapida ai Permessi (Formato Ottale UGO):"
+        echo "Ogni cifra (Utente/Gruppo/Altri) è la somma di (4=Lettura, 2=Scrittura, 1=Esecuzione)"
+        echo ""
+
+        echo "--------------------------------------------------------"
+        echo "  Permesso | Significato UGO (rwx) | Uso Comune"
+        echo "--------------------------------------------------------"
+        echo "  777      | rwxrwxrwx             | Tutti i permessi (ATTENZIONE!)"
+        echo "  755      | rwxr-xr-x             | Script Eseguibili e Directory Standard"
+        echo "  700      | rwx------             | Accesso Completo Solo Utente (Massima Privacy)"
+        echo "  644      | rw-r--r--             | File di Testo/Documenti Standard"
+        echo "  600      | rw-------             | File Configurazione Privati"
+        echo "--------------------------------------------------------"
+        echo ""
+
         echo -n "Inserisci i permessi (es. 755): "
         read permissions
+
+        if [ -z "$permissions" ]; then
+          echo "Errore: Permessi non inseriti. Operazione annullata."
+          exit 1
+        fi
+
         echo -n "Inserisci il nome del file: "
         read filename
+
+        if [ -z "$filename" ]; then
+          echo "Errore: Nome file non inserito. Operazione annullata."
+          exit 1
+        fi
+
+        if [ ! -e "$filename" ]; then
+          echo "Attenzione: Il file '$filename' non esiste. Lo creo per l'esempio."
+          touch "$filename"
+        fi
+
         echo "Eseguendo 'chmod $permissions $filename': Cambia i permessi del file."
-        chmod $permissions $filename
+        chmod $permissions "$filename"
+
+        echo "Permessi aggiornati:"
+        ls -l "$filename" | awk '{print $1, $NF}'
         ;; 
       "chown")
         echo -n "Inserisci il nuovo proprietario: "
