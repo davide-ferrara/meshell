@@ -74,8 +74,14 @@ case "$1" in
         cd $(meshell_list_dirs)
         ;; 
       "cdback")
-        cd .. 
+        cd ..
         ;; 
+      "cdhome")
+        cd ~
+        ;;
+      "cdroot")
+        cd /
+        ;;
       "ls")
         echo "Eseguendo 'ls -la': Elenca i file e le directory con i dettagli."
         ls -la
