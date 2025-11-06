@@ -1,12 +1,13 @@
 import "@picocss/pico/css/pico.min.css";
 import "xterm/css/xterm.css";
-import { Terminal, XtermOptions } from "xterm";
+import { Terminal } from "xterm";
 import { FitAddon } from "xterm-addon-fit";
 
 let labs;
 
 class Meshell {
   constructor(tname) {
+    console.log(`New Meshell created for ${tname}`);
     this.tname = tname;
     this.tabId = this.tname + "-tab";
     this.tab = null;
@@ -15,7 +16,6 @@ class Meshell {
     this.fitAddon = new FitAddon();
 
     this.term = new Terminal({
-      cols: 1000,
       cursorBlink: true,
       fontSize: 18,
       fontFamily: "monospace",
@@ -25,7 +25,6 @@ class Meshell {
         cursor: "#FFFFFF",
       },
     });
-    // this.term.options = {};
     this.term.open(document.getElementById(this.tname));
     this.term.loadAddon(this.fitAddon);
 
@@ -34,6 +33,7 @@ class Meshell {
 
     this.term.onResize((size) => {
       const { cols, rows } = size;
+      console.log(`Terminal resized to ${cols} cols, ${rows} rows`);
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
         this.ws.send(JSON.stringify({ type: "resize", cols, rows }));
       }
@@ -44,24 +44,25 @@ class Meshell {
 
   openConnection() {
     if (this.ws) {
-      this.term.writeln("\r\nConnessione già aperta.");
+      this.term.writeln("\r\nConnection already open.");
       return;
     }
 
     this.fitAddon.fit();
     const rows = this.term.rows;
     const cols = this.term.cols;
-    this.ws = new WebSocket(
-      `ws://${location.host}/tty?rows=${rows}&cols=${cols}`,
-    );
+    const socketURL = `ws://${location.host}/tty?rows=${rows}&cols=${cols}`;
+
+    console.log(`Opening WebSocket to: ${socketURL}`);
+    this.ws = new WebSocket(socketURL);
 
     this.ws.binaryType = "arraybuffer";
 
     this.ws.onopen = () => {
-      this.term.writeln("\r\nWebsocket aperto.");
+      console.log("WebSocket connection established.");
+      this.term.writeln("\r\nWebSocket open.");
       this.term.focus();
 
-      // Invia ogni input dell’utente direttamente al server
       this.term.onData((data) => {
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
           this.ws.send(data);
@@ -70,40 +71,43 @@ class Meshell {
     };
 
     this.ws.onmessage = (event) => {
-      // Scrive tutto ciò che arriva dal server nel terminale
       this.term.write(new Uint8Array(event.data));
     };
 
-    this.ws.onerror = () => {
-      this.term.writeln("\r\nErrore WebSocket.");
+    this.ws.onerror = (event) => {
+      console.error("WebSocket error:", event);
+      this.term.writeln("\r\nWebSocket error.");
     };
 
     this.ws.onclose = () => {
-      this.term.writeln("\r\nConnessione chiusa.");
+      console.log("WebSocket connection closed.");
+      this.term.writeln("\r\nConnection closed.");
       this.ws = null;
     };
   }
 
   closeConnection() {
     if (this.ws) {
+      console.log("Closing WebSocket connection.");
       this.ws.close();
       this.ws = null;
     } else {
-      this.term.writeln("\r\nNessuna connessione aperta.");
+      this.term.writeln("\r\nNo open connection.");
     }
   }
 
   sendCommand(command) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      console.log(`Sending command: ${command}`);
       this.ws.send(command + "\n");
-      // this.ws.send(command);
     } else {
-      this.term.writeln("\r\nNessuna connessione aperta.");
+      this.term.writeln("\r\nNo open connection.");
     }
   }
 }
 
 function tabsHandler(tabId) {
+  console.log(`Switching to tab: ${tabId}`);
   const tabs = document.querySelectorAll("#tabs > button");
 
   tabs.forEach((button) => {
@@ -144,16 +148,13 @@ function scrollToTop() {
 }
 
 function setupCommandButtons() {
-  const blacklist = new Array();
-  blacklist.push("clear-terminal");
-  blacklist.push("font-size-decrease");
-  blacklist.push("font-size-increase");
-
+  const blacklist = ["clear-terminal", "font-size-decrease", "font-size-increase"];
   const commandButtons = document.querySelectorAll(".button-panel > button");
 
   commandButtons.forEach((button) => {
     button.addEventListener("click", () => {
       const command = button.id;
+      console.log(`Button clicked: ${command}`);
 
       if (!blacklist.includes(command)) {
         const activeTerminal = getActiveTerminal();
@@ -167,18 +168,13 @@ function setupCommandButtons() {
 }
 
 function main() {
-  console.log("Index.js loaded!");
+  console.log("Initializing main function.");
 
-  labs = new Array();
+  labs = [];
   const lab1 = new Meshell("terminal-lab1");
   const lab2 = new Meshell("terminal-lab2");
-  // const lab3 = new Meshell("terminal-lab3");
-  // const lab4 = new Meshell("terminal-lab4");
 
-  labs.push(lab1);
-  labs.push(lab2);
-  // labs.push(lab3);
-  // labs.push(lab4);
+  labs.push(lab1, lab2);
 
   labs.forEach((lab) => {
     lab.openConnection();
@@ -189,6 +185,7 @@ function main() {
   window.addEventListener("resize", () => {
     const activeTerminal = getActiveTerminal();
     if (activeTerminal) {
+      console.log("Window resized, fitting active terminal.");
       activeTerminal.fitAddon.fit();
     }
   });
@@ -196,30 +193,24 @@ function main() {
   document
     .getElementById("font-size-increase")
     .addEventListener("click", () => {
-      let currFontSize;
       const activeTerminal = getActiveTerminal();
       if (activeTerminal) {
-        currFontSize = activeTerminal.term.options.fontSize;
-        activeTerminal.term.options = { fontSize: currFontSize + 2 };
+        activeTerminal.term.options.fontSize += 2;
       }
     });
 
   document
     .getElementById("font-size-decrease")
     .addEventListener("click", () => {
-      let currFontSize;
       const activeTerminal = getActiveTerminal();
       if (activeTerminal) {
-        currFontSize = activeTerminal.term.options.fontSize;
-        activeTerminal.term.options = { fontSize: currFontSize - 2 };
+        activeTerminal.term.options.fontSize -= 2;
       }
     });
 
   document.getElementById("clear-terminal").addEventListener("click", () => {
-    let currFontSize;
     const activeTerminal = getActiveTerminal();
     if (activeTerminal) {
-      activeTerminal.sendCommand("clear");
       activeTerminal.term.clear();
     }
   });
