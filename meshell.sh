@@ -78,10 +78,10 @@ case "$1" in
         ;; 
       "cdhome")
         cd ~ >/dev/null
-        ;
+        ;;
       "cdroot")
         cd / >/dev/null
-        ;
+        ;;
       "ls")
         echo "Eseguendo 'ls -la': Elenca i file e le directory con i dettagli."
         ls -la
