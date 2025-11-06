@@ -87,7 +87,7 @@ case "$1" in
         ls -la
         ;; 
       "inode")
-        echo "Eseguendo 'ls -ll': Elenca i file e le directory con i dettagli e gli inode."
+        echo "Eseguendo 'ls -li': Elenca i file e le directory con i dettagli e gli inode."
         ls -li
         ;; 
       "pwd")
@@ -144,13 +144,13 @@ case "$1" in
         top
         ;; 
       "kill")
-        echo -n "Inserisci l\'ID del processo da terminare: "
+        echo -n "Inserisci l'ID del processo da terminare: "
         read pid
-        echo "Eseguendo 'kill $pid': Termina il processo con l\'ID specificato."
+        echo "Eseguendo 'kill $pid': Termina il processo con l'ID specificato."
         kill $pid
         ;; 
       "update")
-        echo "Eseguendo 'sudo apt update && sudo apt upgrade': Aggiorna l\'elenco dei pacchetti e aggiorna i pacchetti installati."
+        echo "Eseguendo 'sudo apt update && sudo apt upgrade': Aggiorna l'elenco dei pacchetti e aggiorna i pacchetti installati."
         sudo apt update && sudo apt -y upgrade
         ;; 
       "install")
@@ -178,7 +178,7 @@ case "$1" in
         touch $filename
         ;; 
       "tree")
-        echo "Eseguendo 'tree -L \$n': Mostra la struttura delle directory ad albero."
+        echo "Eseguendo 'tree -L $n': Mostra la struttura delle directory ad albero."
         read -p "Fino a che livello vuoi scendere? " n
         echo $n
         if [[ -z "$n" ]]; then
@@ -271,36 +271,36 @@ case "$1" in
         echo -n "Inserisci il nome del file: "
         read filename
         echo "Eseguendo 'chown $owner $filename': Cambia il proprietario del file."
-        chown $owner $filename
+        sudo chown $owner $filename
         ;; 
       "ping")
-        echo -n "Inserisci l\'host da pingare: "
+        echo -n "Inserisci l'host da pingare: "
         read host
-        echo "Eseguendo 'ping $host': Invia pacchetti ICMP all\'host specificato."
+        echo "Eseguendo 'ping $host': Invia pacchetti ICMP all'host specificato."
         ping $host
         ;; 
       "wget")
-        echo -n "Inserisci l\'URL da scaricare: "
+        echo -n "Inserisci l'URL da scaricare: "
         read url
-        echo "Eseguendo 'wget $url': Scarica un file dall\'URL specificato."
+        echo "Eseguendo 'wget $url': Scarica un file dall'URL specificato."
         wget $url
         ;; 
       "curl")
-        echo -n "Inserisci l\'URL da scaricare: "
+        echo -n "Inserisci l'URL da scaricare: "
         read url
         echo "Eseguendo 'curl $url': Scarica il contenuto di un URL."
         curl $url
         ;; 
       "ip")
-        echo "Eseguendo 'ip a': Mostra le informazioni sull\'interfaccia di rete."
+        echo "Eseguendo 'ip a': Mostra le informazioni sull'interfaccia di rete."
         ip a
         ;; 
       "netcat")
-        echo -n "Inserisci l\'host a cui connettersi: "
+        echo -n "Inserisci l'host a cui connettersi: "
         read host
         echo -n "Inserisci la porta: "
         read port
-        echo "Eseguendo 'netcat $host $port': Stabilisce una connessione TCP con l\'host e la porta specificati."
+        echo "Eseguendo 'netcat $host $port': Stabilisce una connessione TCP con l'host e la porta specificati."
         netcat $host $port
         ;; 
       "portmap")
@@ -314,9 +314,9 @@ case "$1" in
         dig $domain
         ;; 
       "host")
-        echo -n "Inserisci il dominio o l\'indirizzo IP da interrogare: "
+        echo -n "Inserisci il dominio o l'indirizzo IP da interrogare: "
         read host
-        echo "Eseguendo 'host $host': Esegue una ricerca DNS per l\'host specificato."
+        echo "Eseguendo 'host $host': Esegue una ricerca DNS per l'host specificato."
         host $host
         ;; 
       "nslookup")
@@ -446,7 +446,7 @@ case "$1" in
         history
         ;; 
       "date")
-        echo "Eseguendo 'date': Mostra la data e l\'ora correnti."
+        echo "Eseguendo 'date': Mostra la data e l'ora correnti."
         date
         ;; 
       "cal")
@@ -458,7 +458,7 @@ case "$1" in
         uname -a
         ;; 
       "du")
-        echo "Eseguendo 'du -h': Mostra l\'utilizzo dello spazio su disco in formato leggibile."
+        echo "Eseguendo 'du -h': Mostra l'utilizzo dello spazio su disco in formato leggibile."
         du -h
         ;; 
       "vm_stat")
@@ -466,11 +466,11 @@ case "$1" in
         vm_stat
         ;; 
       "ifconfig")
-        echo "Eseguendo 'ifconfig': Mostra le informazioni sull\'interfaccia di rete."
+        echo "Eseguendo 'ifconfig': Mostra le informazioni sull'interfaccia di rete."
         ifconfig
         ;; 
       "netstat")
-        echo "Eseguendo 'netstat -an': Mostra le connessioni di rete, le tabelle di routing, le statistiche dell\'interfaccia, le connessioni mascherate e le appartenenze multicast."
+        echo "Eseguendo 'netstat -an': Mostra le connessioni di rete, le tabelle di routing, le statistiche dell'interfaccia, le connessioni mascherate e le appartenenze multicast."
         netstat -an
         ;; 
       "route")
