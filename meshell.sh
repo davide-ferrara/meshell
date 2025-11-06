@@ -372,6 +372,10 @@ case "$1" in
         echo "Eseguendo 'mkdir $folder_name': Crea una nuova directory."
         mkdir $folder_name
         ;; 
+      "passwd")
+        echo -n "Passwd permette di cambiare la password dell'utente corrente."
+        passwd
+        ;; 
       "useradd")
         echo -n "Inserisci il nome utente da creare: "
         read username
