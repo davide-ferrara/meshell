@@ -377,6 +377,12 @@ case "$1" in
         echo ""
         passwd
         ;;
+      "sudash")
+        echo -n "Eseguendo: su -utente. Permette di cambiare utente."
+        echo "Inserisci il nome dell'utente: "
+        read user
+        su - user
+        ;;
       "useradd")
         echo -n "Inserisci il nome utente da creare: "
         read username
@@ -394,7 +400,7 @@ case "$1" in
       "userlock")
         echo -n "Inserisci il nome utente da bloccare: "
         read user
-        echo "Eseguendo 'sudo usermod $user': Blocca l'utente $user."
+        echo "Eseguendo 'sudo usermod -L $user': Blocca l'utente $user."
         echo ""
         sudo usermod -L $user
         echo "Utente $user bloccato con successoo."
