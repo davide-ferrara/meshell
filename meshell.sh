@@ -225,6 +225,7 @@ case "$1" in
         echo -n "Inserisci il valore della maschera: "
         read mask
         umask $mask
+        echo "Umask impostato su: $(umask)"
         ;; 
       "chmod")
         echo "Guida rapida ai Permessi (Formato Ottale UGO):"
