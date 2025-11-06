@@ -217,8 +217,10 @@ case "$1" in
         if [ -z "$mask" ]; then
             echo "Errore: Nessun valore inserito. Umask non modificata."
             echo "Umask attuale rimane: $(umask)"
+            exit 1
         fi
             umask "$mask"
+            echo "Umask impostato su: $(umask)"
         ;; 
       "chmod")
         echo "Guida rapida ai Permessi (Formato Ottale UGO):"
