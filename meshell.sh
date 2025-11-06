@@ -353,12 +353,13 @@ case "$1" in
         file $filename
         ;; 
       "alias")
-        echo -n "Inserisci il nome dell\'alias: "
+        echo -n "Inserisci il nome dell'alias: "
         read alias_name
-        echo -n "Inserisci il comando per l\'alias: "
+        echo -n "Inserisci il comando per l'alias: "
         read command
         echo "Eseguendo 'alias $alias_name=\"$command\"': Crea un alias per un comando."
-        alias $alias_name="$command"
+        echo "alias $alias_name='$command'" >> ~/.bash_aliases
+        source ~/.bash_aliases
         ;; 
       "alias-remove")
         echo -n "Inserisci il nome dell\'alias da rimuovere: "
