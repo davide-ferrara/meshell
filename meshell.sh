@@ -67,6 +67,7 @@ case "$1" in
         echo "Aggiornado Meshell"
         cd /usr/share/meshell/
         git pull
+        cd
         ;; 
       "cd")
         echo "Eseguendo 'cd': Permette di cambiare directory"
