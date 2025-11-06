@@ -414,7 +414,8 @@ case "$1" in
         ;; 
       "groups")
         echo -n "Eseguendo il comando: groups"
-        echo -n "Gruppi a cui appartiene $(whoami): \n"
+        echo ""
+        echo -n "Gruppi a cui appartiene $(whoami): "
         groups
         ;; 
       "groupadd")
