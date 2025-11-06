@@ -85,7 +85,8 @@ class Meshell {
 
   sendCommand(command) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(command + "\n");
+      // this.ws.send(command + "\n");
+      this.ws.send(command);
     } else {
       this.term.writeln("\r\nNessuna connessione aperta.");
     }
