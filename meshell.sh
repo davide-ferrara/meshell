@@ -383,6 +383,14 @@ case "$1" in
         echo "Eseguendo 'sudo useradd $username': Crea un nuovo utente."
         sudo useradd $username
         ;; 
+      "userlock")
+        echo -n "Inserisci il nome utente da bloccare: "
+        read user
+        echo "Eseguendo 'sudo usermod $user': Blocca l'utente $user."
+        echo ""
+        sudo usermod -L $user
+        echo "Utente $user bloccato con successoo."
+        ;; 
       "userdel")
         echo -n "Inserisci il nome utente da eliminare: "
         read username
@@ -400,14 +408,6 @@ case "$1" in
         read group_name
         echo "Eseguendo 'sudo groupdel $group_name': Elimina un gruppo."
         sudo groupdel $group_name
-        ;; 
-      "usermod")
-        echo -n "Inserisci il nome utente da modificare: "
-        read username
-        echo -n "Inserisci il nuovo gruppo: "
-        read group_name
-        echo "Eseguendo 'sudo usermod -aG $group_name $username': Aggiunge un utente a un gruppo."
-        sudo usermod -aG $group_name $username
         ;; 
       "showusers")
         echo -n "Utenti del sistema con UID >= 1000 contenuto in /etc/passwd: "
