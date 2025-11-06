@@ -74,13 +74,13 @@ case "$1" in
         cd $(meshell_list_dirs) >> /dev/null
         ;; 
       "cdback")
-        cd ..
+        cd .. >> /dev/null
         ;; 
       "cdhome")
-        cd ~
+        cd ~ >> /dev/null
         ;;
       "cdroot")
-        cd /
+        cd / >> /dev/null
         ;;
       "ls")
         echo "Eseguendo 'ls -la': Elenca i file e le directory con i dettagli."
@@ -160,7 +160,6 @@ case "$1" in
         sudo apt install -y $package
         ;; 
       "search")
-
         echo -n "Inserisci il nome del pacchetto da cercare: "
         read package
         echo "Eseguendo 'apt search $package': Cerca il pacchetto specificato."
@@ -170,7 +169,7 @@ case "$1" in
         echo -n "Inserisci il nome del pacchetto da rimuovere: "
         read package
         echo "Eseguendo 'sudo apt remove $package': Rimuove il pacchetto specificato."
-        sudo apt remove $package
+        sudo apt remove -y $package
         ;; 
       "touch")
         echo -n "Inserisci il nome del file da creare: "
