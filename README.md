@@ -10,6 +10,7 @@
 
 <p align="center">
   <a href="#features">Features</a> •
+  <a href="#gallery">Gallery</a> •
   <a href="#getting-started">Getting Started</a> •
   <a href="#commands">Commands</a> •
   <a href="#license">License</a>
@@ -23,6 +24,12 @@
 *   **Multi-Tab Interface**: Easily switch between multiple remote sessions.
 *   **Predefined Command Buttons**: Execute common commands with a single click, categorized for ease of use.
 *   **Modern UI**: A clean and modern user interface built with Pico.css and Vite.
+
+## Gallery
+
+<p align="center">
+  <img src="docs/gallery1.png" alt="Meshell Screenshot" width="800"/>
+</p>
 
 ## Getting Started
 
@@ -68,4 +75,4 @@ The Meshell web interface provides buttons for the following commands, grouped b
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU GPLv3 - see the [LICENSE](LICENSE) file for details.
