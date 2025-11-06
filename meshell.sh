@@ -376,16 +376,21 @@ case "$1" in
         echo -n "Passwd permette di cambiare la password dell'utente corrente."
         echo ""
         passwd
-        ;; 
+        ;;
       "useradd")
         echo -n "Inserisci il nome utente da creare: "
         read username
-        echo "Eseguendo 'sudo useradd $username': Crea un nuovo utente."
-        sudo useradd $username
-        echo "Inserisci la passowrd di $username: "
-        echo ""
+        # -m -> Crea la directory Home
+        # -s /bin/bash -> Imposta la shell
+        echo "Eseguendo 'sudo useradd -m -s /bin/bash $username'..."
+        sudo useradd -m -s /bin/bash $username
+
+        echo "--------------------------------------------------------"
+        echo "Ora imposta la password per $username:"
         sudo passwd $username
-        ;; 
+        echo "--------------------------------------------------------"
+        echo "Utente $username creato con successo."
+        ;;
       "userlock")
         echo -n "Inserisci il nome utente da bloccare: "
         read user
