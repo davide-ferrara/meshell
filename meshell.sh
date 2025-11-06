@@ -374,6 +374,7 @@ case "$1" in
         ;; 
       "passwd")
         echo -n "Passwd permette di cambiare la password dell'utente corrente."
+        echo ""
         passwd
         ;; 
       "useradd")

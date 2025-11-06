@@ -32,7 +32,7 @@ var (
 	upgrader = websocket.Upgrader{} // Impostazioni predefinite
 	addr     = flag.String("addr", "localhost:8080", "HTTP service address")
 	clients  = []Client{
-		{username: "root", password: "root", addr: "localhost:9090"},
+		{username: "lab1", password: "lab1", addr: "localhost:9090"},
 		{username: "lab2", password: "lab2", addr: "localhost:9091"},
 	}
 )
