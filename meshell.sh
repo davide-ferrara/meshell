@@ -379,9 +379,10 @@ case "$1" in
         ;;
       "sudash")
         echo -n "Eseguendo: su -utente. Permette di cambiare utente."
+        echo ""
         echo "Inserisci il nome dell'utente: "
         read user
-        su - user
+        su - $user
         ;;
       "useradd")
         echo -n "Inserisci il nome utente da creare: "
