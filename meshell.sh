@@ -382,6 +382,9 @@ case "$1" in
         read username
         echo "Eseguendo 'sudo useradd $username': Crea un nuovo utente."
         sudo useradd $username
+        echo "Inserisci la passowrd di $username: "
+        echo ""
+        sudo passwd $username
         ;; 
       "userlock")
         echo -n "Inserisci il nome utente da bloccare: "
