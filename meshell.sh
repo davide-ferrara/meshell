@@ -446,9 +446,9 @@ case "$1" in
         read user
         echo -n "Inserisci il nome del gruppo a cui aggiungere l'utente: "
         echo ""
-        read gruop_name
-        echo "Eseguendo 'sudo usermod -aG $group_name $user'"
-        sudo usermod -aG $gruop_name $user
+        read group
+        echo "Eseguendo 'sudo usermod -aG $group $user'"
+        sudo usermod -aG $group $user
         ;;
       "user-remove-to-group")
         echo -n "Rimuovi un utente da un gruppo."
@@ -458,7 +458,7 @@ case "$1" in
         read user
         echo -n "Inserisci il nome del gruppo: "
         echo ""
-        read gruop
+        read group
         echo "Eseguendo 'gpasswd -d $user $group'"
         sudo gpasswd -d $user $group
         ;;
