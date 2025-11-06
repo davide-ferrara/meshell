@@ -151,7 +151,7 @@ function setupCommandButtons() {
             button.id === "cd" ||
             button.id === "cdback" ||
             button.id === "cdhome" ||
-            button.id === "cdroot"
+            button.id === "cdroot" ||
             button.id === "umask"
           ) {
             // Important to use source or the script will be executed in a child process
