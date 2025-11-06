@@ -222,7 +222,7 @@ case "$1" in
         echo "   - Calcolo per DIRECTORY: 777 - 022 = 755 (rwxr-xr-x)"
         echo "   - Calcolo per FILE:      666 - 022 = 644 (rw-r--r--)"
         echo "--------------------------------------------------------"
-        echo -n "Inserisci il valore della maschera: "
+        echo "Inserisci il valore della maschera: "
         read mask
         umask $mask
         echo "Umask impostato su: $(umask)"
