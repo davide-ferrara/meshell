@@ -497,6 +497,9 @@ case "$1" in
         read port
         sudo netstat -anp | grep "$port"
         ;; 
+      "hosts-edit")
+        sudo vi /etc/hosts
+        ;; 
       "route")
         echo "Eseguendo 'netstat -r': Mostra la tabella di routing IP."
         netstat -r
