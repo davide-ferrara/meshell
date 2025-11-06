@@ -452,14 +452,15 @@ case "$1" in
         ;;
       "user-remove-to-group")
         echo -n "Rimuovi un utente da un gruppo."
-        echo -n "Inserisci il nome dell'utente da rimuovere da un gruppo: "
+        echo ""
+        echo -n "Inserisci il nome dell'utente da rimuovere: "
         echo ""
         read user
         echo -n "Inserisci il nome del gruppo: "
         echo ""
         read gruop
         echo "Eseguendo 'gpasswd -d $user $group'"
-        sudo gpasswd -d user group
+        sudo gpasswd -d $user $group
         ;;
       "history")
         echo "Eseguendo 'history': Mostra la cronologia dei comandi."
