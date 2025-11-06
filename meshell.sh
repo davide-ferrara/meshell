@@ -411,7 +411,7 @@ case "$1" in
         sudo userdel -fr $username
         ;; 
       "groups")
-        echo "Eseguendo il comando: groups\n"
+        echo -n "Eseguendo il comando: groups"
         echo -n "Gruppi a cui appartiene $(whoami): \n"
         groups
         ;; 
@@ -438,7 +438,7 @@ case "$1" in
         awk -F: '($3 >= 1000) {print $1}' /etc/group
         ;;
       "useraddtogroup")
-        echo "Aggiungi un utente ad un gruppo \n"
+        echo -n "Aggiungi un utente ad un gruppo."
         echo -n "Inserisci il nome dell'utente da aggiungere al gruppo"
         echo ""
         read user
