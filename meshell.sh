@@ -222,10 +222,20 @@ case "$1" in
         echo "   - Calcolo per DIRECTORY: 777 - 022 = 755 (rwxr-xr-x)"
         echo "   - Calcolo per FILE:      666 - 022 = 644 (rw-r--r--)"
         echo "--------------------------------------------------------"
-        echo "Inserisci il valore della maschera: "
+        echo -n "Inserisci il valore della maschera (es. 022): "
         read mask
-        umask $mask
-        echo "Umask impostato su: $(umask)"
+
+        if [ -z "$mask" ]; then
+            echo "Errore: Nessun valore inserito. Umask non modificata."
+            echo "Umask attuale rimane: $(umask)"
+        else
+            if umask "$mask" 2>/dev/null; then
+                echo "Umask impostata con successo su: $(umask)"
+            else
+                echo "Errore: '$mask' non e' una modalita' umask valida."
+                echo "Umask precedente non modificata."
+            fi
+        fi
         ;; 
       "chmod")
         echo "Guida rapida ai Permessi (Formato Ottale UGO):"
