@@ -495,7 +495,7 @@ case "$1" in
         echo "Eseguendo 'netstat -anp': Mostra le connessioni di rete, le tabelle di routing, le statistiche dell'interfaccia, le connessioni mascherate e le appartenenze multicast."
         echo "Inserisci una porta: "
         read port
-        netstat -anp | grep "$port"
+        sudo netstat -anp | grep "$port"
         ;; 
       "route")
         echo "Eseguendo 'netstat -r': Mostra la tabella di routing IP."
