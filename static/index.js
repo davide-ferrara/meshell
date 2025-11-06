@@ -19,7 +19,11 @@ class Meshell {
       cursorBlink: true,
       fontSize: 18,
       fontFamily: "monospace",
-      theme: { background: "#181C25", foreground: "#FFFFFF" },
+      theme: {
+        background: "#181C25",
+        foreground: "#FFFFFF",
+        cursor: "#FFFFFF",
+      },
     };
     this.term.open(document.getElementById(this.tname));
     this.term.loadAddon(this.fitAddon);

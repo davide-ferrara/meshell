@@ -410,6 +410,11 @@ case "$1" in
         # -f -> forced,-r rimuove la home directory
         sudo userdel -fr $username
         ;; 
+      "groups")
+        echo "Eseguendo il comando: groups\n"
+        echo -n "Gruppi a cui appartiene $(whoami): \n"
+        groups
+        ;; 
       "groupadd")
         echo -n "Inserisci il nome del gruppo da creare: "
         read group_name
@@ -433,12 +438,14 @@ case "$1" in
         awk -F: '($3 >= 1000) {print $1}' /etc/group
         ;;
       "useraddtogroup")
+        echo "Aggiungi un utente ad un gruppo \n"
         echo -n "Inserisci il nome dell'utente da aggiungere al gruppo"
         echo ""
         read user
         echo -n "Inserisci il nome del gruppo a cui aggiungere l'utente"
         echo ""
         read gruop_name
+        echo "Eseguendo 'sudo usermod -aG $group_name $user'"
         sudo usermod -aG $gruop_name $user
         ;;
       "history")
