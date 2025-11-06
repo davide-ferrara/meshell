@@ -14,7 +14,7 @@ class Meshell {
     this.term = null;
     this.fitAddon = new FitAddon();
 
-    this.term = new Terminal();
+    this.term = new Terminal({ cols: 80 });
     this.term.options = {
       cursorBlink: true,
       fontSize: 18,
@@ -43,7 +43,12 @@ class Meshell {
       return;
     }
 
-    this.ws = new WebSocket(`ws://${location.host}/tty`);
+    const rows = this.term.rows;
+    const cols = this.term.cols;
+    console.log(rows, cols);
+    this.ws = new WebSocket(
+      `ws://${location.host}/tty?rows=${rows}&cols=${cols}`,
+    );
 
     this.ws.binaryType = "arraybuffer";
 

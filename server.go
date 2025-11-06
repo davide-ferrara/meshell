@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"sync"
 
 	// "text/template"
@@ -75,7 +76,7 @@ func connectSSH(user string, password string, addr string) (*ssh.Client, error) 
 
 // --- Creazione della sessione SSH con pipe pre-Shell() ---
 
-func setupSSHSession(client *ssh.Client) (*ssh.Session, io.WriteCloser, io.Reader, io.Reader, error) {
+func setupSSHSession(client *ssh.Client, rows int, cols int) (*ssh.Session, io.WriteCloser, io.Reader, io.Reader, error) {
 	session, err := client.NewSession()
 	if err != nil {
 		return nil, nil, nil, nil, fmt.Errorf("failed to create session: %w", err)
@@ -106,7 +107,7 @@ func setupSSHSession(client *ssh.Client) (*ssh.Session, io.WriteCloser, io.Reade
 		ssh.TTY_OP_OSPEED: 14400,
 	}
 
-	if err := session.RequestPty("xterm", 80, 40, modes); err != nil {
+	if err := session.RequestPty("xterm", rows, cols, modes); err != nil {
 		session.Close()
 		return nil, nil, nil, nil, fmt.Errorf("request pty failed: %w", err)
 	}
@@ -201,6 +202,17 @@ func tty(w http.ResponseWriter, r *http.Request) {
 	log.Println("HTTP upgraded to WS")
 	defer ws.Close()
 
+	colsStr := r.URL.Query().Get("cols")
+	rowsStr := r.URL.Query().Get("rows")
+	cols, _ := strconv.Atoi(colsStr)
+	rows, _ := strconv.Atoi(rowsStr)
+	if cols == 0 {
+		cols = 80
+	}
+	if rows == 0 {
+		rows = 40
+	}
+
 	// Connessione SSH
 	// sshClient, err := connectSSH("lab1", "lab1", "localhost:9090")
 	for _, client := range clients {
@@ -212,7 +224,7 @@ func tty(w http.ResponseWriter, r *http.Request) {
 		}
 		defer sshClient.Close()
 
-		sshSession, sshStdin, sshStdout, sshStderr, err := setupSSHSession(sshClient)
+		sshSession, sshStdin, sshStdout, sshStderr, err := setupSSHSession(sshClient, rows, cols)
 		if err != nil {
 			log.Println("SSH session setup failed:", err)
 			ws.WriteMessage(websocket.TextMessage, []byte("SSH session setup failed"))
