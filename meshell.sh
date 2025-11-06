@@ -554,7 +554,7 @@ case "$1" in
         ;;
       "dmesg")
         echo "Eseguendo 'dmesg': Mostra i messaggi del kernel."
-        dmesg
+        sudo dmesg
         ;;
       "journalctl")
         echo "Eseguendo 'journalctl': Mostra il journal di sistema."

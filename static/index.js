@@ -14,8 +14,8 @@ class Meshell {
     this.term = null;
     this.fitAddon = new FitAddon();
 
-    this.term = new Terminal({ cols: 1000 });
-    this.term.options = {
+    this.term = new Terminal({
+      cols: 1000,
       cursorBlink: true,
       fontSize: 18,
       fontFamily: "monospace",
@@ -24,7 +24,8 @@ class Meshell {
         foreground: "#FFFFFF",
         cursor: "#FFFFFF",
       },
-    };
+    });
+    // this.term.options = {};
     this.term.open(document.getElementById(this.tname));
     this.term.loadAddon(this.fitAddon);
 
