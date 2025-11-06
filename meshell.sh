@@ -411,7 +411,21 @@ case "$1" in
         ;; 
       "showusers")
         echo -n "Utenti del sistema con UID > 1000 contenuto in /etc/passwd: "
+        echo ""
         awk -F: '($3 >= 1000) {print $1}' /etc/passwd
+        ;;
+      "showgroups")
+        echo -n "Gruppi del sistema con UID > 1000 contenuto in /etc/group: "
+        awk -F: '($3 >= 1000) {print $1}' /etc/group
+        ;;
+      "useraddtogroup")
+        echo -n "Inserisci il nome dell'utente da aggiungere al gruppo"
+        echo ""
+        read user
+        echo -n "Inserisci il nome del gruppo a cui aggiungere l'utente"
+        echo ""
+        read gruop_name
+        sudo usermood -aG $gruop_name $user
         ;;
       "history")
         echo "Eseguendo 'history': Mostra la cronologia dei comandi."
