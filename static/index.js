@@ -148,18 +148,18 @@ function setupCommandButtons() {
       if (!blacklist.includes(command)) {
         const activeTerminal = getActiveTerminal();
         if (activeTerminal) {
-          if (
-            button.id === "cd" ||
-            button.id === "cdback" ||
-            button.id === "cdhome" ||
-            button.id === "cdroot" ||
-            button.id === "umask"
-          ) {
-            // Important to use source or the script will be executed in a child process
-            activeTerminal.sendCommand(`source meshell --cmd ${command}`);
-          } else {
-            activeTerminal.sendCommand(`meshell --cmd ${command}`);
-          }
+          // if (
+          //   button.id === "cd" ||
+          //   button.id === "cdback" ||
+          //   button.id === "cdhome" ||
+          //   button.id === "cdroot" ||
+          //   button.id === "umask"
+          // ) {
+          //   // Important to use source or the script will be executed in a child process
+          //   activeTerminal.sendCommand(`source meshell --cmd ${command}`);
+          // } else {
+          activeTerminal.sendCommand(`source meshell --cmd ${command}`);
+          // }
           scrollToTop();
         }
       }
