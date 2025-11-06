@@ -439,16 +439,27 @@ case "$1" in
         echo ""
         awk -F: '($3 >= 1000) {print $1}' /etc/group
         ;;
-      "useraddtogroup")
+      "user-add-to-group")
         echo -n "Aggiungi un utente ad un gruppo."
-        echo -n "Inserisci il nome dell'utente da aggiungere al gruppo"
+        echo -n "Inserisci il nome dell'utente da aggiungere al gruppo: "
         echo ""
         read user
-        echo -n "Inserisci il nome del gruppo a cui aggiungere l'utente"
+        echo -n "Inserisci il nome del gruppo a cui aggiungere l'utente: "
         echo ""
         read gruop_name
         echo "Eseguendo 'sudo usermod -aG $group_name $user'"
         sudo usermod -aG $gruop_name $user
+        ;;
+      "user-remove-to-group")
+        echo -n "Rimuovi un utente da un gruppo."
+        echo -n "Inserisci il nome dell'utente da rimuovere da un gruppo: "
+        echo ""
+        read user
+        echo -n "Inserisci il nome del gruppo: "
+        echo ""
+        read gruop
+        echo "Eseguendo 'gpasswd -d $user $group'"
+        sudo gpasswd -d user group
         ;;
       "history")
         echo "Eseguendo 'history': Mostra la cronologia dei comandi."
