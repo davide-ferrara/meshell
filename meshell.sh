@@ -362,10 +362,7 @@ case "$1" in
         source ~/.bash_aliases
         ;; 
       "alias-remove")
-        echo -n "Inserisci il nome dell\'alias da rimuovere: "
-        read alias_name
-        echo "Eseguendo 'unalias $alias_name': Rimuove un alias."
-        unalias $alias_name
+        vi ~/.bash_aliases
         ;; 
       "mkdir")
         echo -n "Inserisci il nome della cartella da creare: "
