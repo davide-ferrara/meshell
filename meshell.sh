@@ -195,8 +195,36 @@ case "$1" in
         ln -s $target $link_name
         ;; 
       "umask")
-        echo "Eseguendo 'umask': Mostra la maschera di creazione dei file dell\'utente."
+        echo "=========================================================="
+        echo "          SPIEGAZIONE DEL COMANDO UMASK"
+        echo "=========================================================="
+        echo "umask (User Mask) DEFINISCE i permessi di default per i nuovi file/directory."
+        echo ""
+        echo "FUNZIONAMENTO LOGICO:"
+        echo "UMASK SOTTRAE i permessi che NON vuoi che vengano assegnati, dai massimi permessi possibili."
+        echo ""
+        echo "   - Massimi per i FILE:      666 (rw-rw-rw-)"
+        echo "   - Massimi per DIRECTORY:   777 (rwxrwxrwx)"
+        echo ""
+        echo "=========================================================="
+        echo "1) Umask Attuale"
+        echo "=========================================================="
+        echo "Mostra la maschera di creazione dei file dell'utente ('umask'):"
+        echo "--------------------------------------------------------"
+        UMASK_ATTUALE=$(umask)
         umask
+        echo "--------------------------------------------------------"
+        echo "L'umask corrente è: $UMASK_ATTUALE"
+        echo "--------------------------------------------------------"
+
+        echo "Umask impostata a 022. Significa: togli il permesso di scrittura (2) al Gruppo e agli Altri."
+        echo ""
+        echo "   - Calcolo per DIRECTORY: 777 - 022 = 755 (rwxr-xr-x)"
+        echo "   - Calcolo per FILE:      666 - 022 = 644 (rw-r--r--)"
+        echo "--------------------------------------------------------"
+        echo -n "Inserisci il valore della maschera: "
+        read mask
+        umask $mask
         ;; 
       "chmod")
         echo "Guida rapida ai Permessi (Formato Ottale UGO):"
