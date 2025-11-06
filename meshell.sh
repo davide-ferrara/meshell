@@ -403,7 +403,8 @@ case "$1" in
         echo -n "Inserisci il nome utente da eliminare: "
         read username
         echo "Eseguendo 'sudo userdel $username': Elimina un utente."
-        sudo userdel $username
+        # -f -> forced,-r rimuove la home directory
+        sudo userdel -fr $username
         ;; 
       "groupadd")
         echo -n "Inserisci il nome del gruppo da creare: "
