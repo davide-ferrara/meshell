@@ -297,18 +297,18 @@ case "$1" in
         echo "Eseguendo 'ip a': Mostra le informazioni sull'interfaccia di rete."
         ip a
         ;; 
-      "netcat")
-        echo -n "Inserisci l'host a cui connettersi: "
-        read host
-        echo -n "Inserisci la porta: "
-        read port
-        echo "Eseguendo 'netcat $host $port': Stabilisce una connessione TCP con l'host e la porta specificati."
-        netcat $host $port
-        ;; 
-      "portmap")
-        echo "Eseguendo 'portmap': Mostra le informazioni sulla mappatura delle porte RPC."
-        portmap
-        ;; 
+      # "netcat")
+      #   echo -n "Inserisci l'host a cui connettersi: "
+      #   read host
+      #   echo -n "Inserisci la porta: "
+      #   read port
+      #   echo "Eseguendo 'netcat $host $port': Stabilisce una connessione TCP con l'host e la porta specificati."
+      #   netcat $host $port
+      #   ;; 
+      # "portmap")
+      #   echo "Eseguendo 'portmap': Mostra le informazioni sulla mappatura delle porte RPC."
+      #   portmap
+      #   ;; 
       "dig")
         echo -n "Inserisci il dominio da interrogare: "
         read domain
@@ -492,8 +492,11 @@ case "$1" in
         ifconfig
         ;; 
       "netstat")
-        echo "Eseguendo 'netstat -an': Mostra le connessioni di rete, le tabelle di routing, le statistiche dell'interfaccia, le connessioni mascherate e le appartenenze multicast."
-        netstat -an
+        echo "Eseguendo 'netstat -anp': Mostra le connessioni di rete, le tabelle di routing, le statistiche dell'interfaccia, le connessioni mascherate e le appartenenze multicast."
+        echo ""
+        echo "Inserisci una porta: "
+        read port
+        netstat -anp $port
         ;; 
       "route")
         echo "Eseguendo 'netstat -r': Mostra la tabella di routing IP."
