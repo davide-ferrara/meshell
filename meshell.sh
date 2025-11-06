@@ -409,6 +409,10 @@ case "$1" in
         echo "Eseguendo 'sudo usermod -aG $group_name $username': Aggiunge un utente a un gruppo."
         sudo usermod -aG $group_name $username
         ;; 
+      "showusers")
+        echo -n "Utenti del sistema con UID > 1000 contenuto in /etc/passwd: "
+        awk -F: '($3 >= 1000) {print $1}' /etc/passwd
+        ;;
       "history")
         echo "Eseguendo 'history': Mostra la cronologia dei comandi."
         history
