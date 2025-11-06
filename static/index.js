@@ -85,8 +85,8 @@ class Meshell {
 
   sendCommand(command) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      // this.ws.send(command + "\n");
-      this.ws.send(command);
+      this.ws.send(command + "\n");
+      // this.ws.send(command);
     } else {
       this.term.writeln("\r\nNessuna connessione aperta.");
     }
@@ -157,8 +157,9 @@ function setupCommandButtons() {
           ) {
             // Important to use source or the script will be executed in a child process
             activeTerminal.sendCommand(`source meshell --cmd ${command}`);
+          } else {
+            activeTerminal.sendCommand(`meshell --cmd ${command}`);
           }
-          activeTerminal.sendCommand(`meshell --cmd ${command}`);
           scrollToTop();
         }
       }
