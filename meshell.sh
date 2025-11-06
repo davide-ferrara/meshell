@@ -268,10 +268,12 @@ case "$1" in
       "chown")
         echo -n "Inserisci il nuovo proprietario: "
         read owner
+        echo -n "Inserisci il nuovo gruppo proprietario: "
+        read group
         echo -n "Inserisci il nome del file: "
         read filename
-        echo "Eseguendo 'chown $owner $filename': Cambia il proprietario del file."
-        sudo chown $owner $filename
+        echo "Eseguendo 'chown -R $owner:$group $filename': Cambia il proprietario del file."
+        sudo chown -R $owner:$group filename
         ;; 
       "ping")
         echo -n "Inserisci l'host da pingare: "
