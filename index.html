@@ -46,12 +46,12 @@
         <button id="terminal-lab2-tab">
           <span contenteditable="true">Lab 2</span>
         </button>
-        <button id="terminal-lab3-tab">
-          <span contenteditable="true">Lab 3</span>
-        </button>
-        <button id="terminal-lab4-tab">
-          <span contenteditable="true">Lab 4</span>
-        </button>
+        <!-- <button id="terminal-lab3-tab"> -->
+        <!--   <span contenteditable="true">Lab 3</span> -->
+        <!-- </button> -->
+        <!-- <button id="terminal-lab4-tab"> -->
+        <!--   <span contenteditable="true">Lab 4</span> -->
+        <!-- </button> -->
       </div>
 
       <article id="terminal-lab1-container" class="terminal-container">
@@ -62,20 +62,20 @@
         <div id="terminal-lab2"></div>
       </article>
 
-      <article id="terminal-lab3-container" hidden>
-        <div id="terminal-lab3"></div>
-      </article>
-
-      <article id="terminal-lab4-container" hidden>
-        <div id="terminal-lab4"></div>
-      </article>
+      <!-- <article id="terminal-lab3-container" hidden> -->
+      <!--   <div id="terminal-lab3"></div> -->
+      <!-- </article> -->
+      <!---->
+      <!-- <article id="terminal-lab4-container" hidden> -->
+      <!--   <div id="terminal-lab4"></div> -->
+      <!-- </article> -->
 
       <br />
 
       <div class="grid button-panel">
         <button class="secondary" id="clear-terminal">Clear Terminal</button>
-        <button class="secondary" id="ls">List Dir</button>
-        <button class="secondary" id="cd">Change Dir</button>
+        <button class="secondary" id="ls">List</button>
+        <button class="secondary" id="cd">Change Directory</button>
         <button class="secondary" id="cdback">..</button>
         <button class="secondary" id="cdhome">~</button>
         <button class="secondary" id="cdroot">/</button>
@@ -94,10 +94,18 @@
           <summary role="button">Package Management</summary>
           <article>
             <div class="button-panel">
-              <button class="secondary advanced" id="update">Update</button>
-              <button class="secondary advanced" id="install">Install</button>
-              <button class="secondary advanced" id="search">Search</button>
-              <button class="secondary advanced" id="remove">Remove</button>
+              <button class="secondary advanced" id="update">
+                Aggiorna Sistema
+              </button>
+              <button class="secondary advanced" id="install">
+                Installa pacchetto
+              </button>
+              <button class="secondary advanced" id="search">
+                Cerca Pacchetto
+              </button>
+              <button class="secondary advanced" id="remove">
+                Rimuovi Pacchetto
+              </button>
             </div>
           </article>
         </details>
@@ -116,16 +124,16 @@
               <button class="secondary advanced" id="uname">Uname</button>
               <button class="secondary" id="uptime">Uptime</button>
               <button class="secondary" id="free">Utilizzo Ram</button>
+              <button class="secondary advanced" id="du">Utilizzo Disco</button>
               <button class="secondary advanced" id="w">
                 Storico connessione
               </button>
               <button class="secondary advanced" id="last">
                 Storico Login
               </button>
-              <!-- <button class="secondary advanced" id="date">Date</button> -->
-              <!-- <button class="secondary advanced" id="cal">Calendar</button> -->
+              <button class="secondary advanced" id="date">Data</button>
+              <button class="secondary advanced" id="cal">Calendario</button>
               <!-- <button class="secondary advanced" id="weather">Weather</button> -->
-              <button class="secondary advanced" id="du">Disk Usage</button>
               <!-- <button class="secondary advanced" id="psu"> -->
               <!--   User Processes -->
               <!-- </button> -->
@@ -231,9 +239,9 @@
               <button class="secondary advanced" id="alias-remove">
                 Rimuovi Alias
               </button>
-              <button class="secondary advanced" id="shell-var0">$?</button>
-              <button class="secondary advanced" id="shell-var1">$1</button>
-              <button class="secondary advanced" id="shell-var2">$2</button>
+              <button class="secondary advanced" id="prompt">Prompt</button>
+              <button class="secondary advanced" id="path">Path</button>
+              <button class="secondary advanced" id="bashrc">Bashrc</button>
             </div>
           </article>
         </details>
@@ -247,10 +255,14 @@
                 Hardware Info
               </button>
               <button class="secondary advanced" id="lsblk">
-                Block Devices
+                Dispositivi a blocco
               </button>
-              <button class="secondary advanced" id="lspci">PCI Devices</button>
-              <button class="secondary advanced" id="lsusb">USB Devices</button>
+              <button class="secondary advanced" id="lspci">
+                Dispositivi PCI
+              </button>
+              <button class="secondary advanced" id="lsusb">
+                Dispositivi USB
+              </button>
             </div>
           </article>
         </details>
@@ -259,32 +271,35 @@
           <article>
             <div class="button-panel">
               <button class="secondary advanced" id="lsmod">
-                List Modules
+                Lista moduli
               </button>
               <button class="secondary advanced" id="dmesg">
-                Kernel Messages
+                Messaggi Kernel
+              </button>
+              <button class="secondary advanced" id="journalctl">
+                Journal
               </button>
             </div>
           </article>
         </details>
-        <details>
-          <summary role="button">Systemd</summary>
-          <article>
-            <div class="button-panel">
-              <button class="secondary advanced" id="systemctl">
-                Services
-              </button>
-              <button class="secondary advanced" id="timers">Timers</button>
-              <button class="secondary advanced" id="sockets">Sockets</button>
-              <button class="secondary advanced" id="targets">Targets</button>
-              <button class="secondary advanced" id="devices">Devices</button>
-              <button class="secondary advanced" id="mounts">Mounts</button>
-              <button class="secondary advanced" id="automounts">
-                Automounts
-              </button>
-            </div>
-          </article>
-        </details>
+        <!-- <details> -->
+        <!--   <summary role="button">Systemd</summary> -->
+        <!--   <article> -->
+        <!--     <div class="button-panel"> -->
+        <!--       <button class="secondary advanced" id="systemctl"> -->
+        <!--         Services -->
+        <!--       </button> -->
+        <!--       <button class="secondary advanced" id="timers">Timers</button> -->
+        <!--       <button class="secondary advanced" id="sockets">Sockets</button> -->
+        <!--       <button class="secondary advanced" id="targets">Targets</button> -->
+        <!--       <button class="secondary advanced" id="devices">Devices</button> -->
+        <!--       <button class="secondary advanced" id="mounts">Mounts</button> -->
+        <!--       <button class="secondary advanced" id="automounts"> -->
+        <!--         Automounts -->
+        <!--       </button> -->
+        <!--     </div> -->
+        <!--   </article> -->
+        <!-- </details> -->
       </div>
 
       <hr />

@@ -188,12 +188,12 @@ case "$1" in
         tree -L $n
         ;; 
       "ln")
-        echo -n "Inserisci il percorso di destinazione: "
-        read target
-        echo -n "Inserisci il nome del collegamento: "
-        read link_name
-        echo "Eseguendo 'ln -s $target $link_name': Crea un collegamento simbolico."
-        ln -s $target $link_name
+        echo -n "Inserisci il file da linkare simbolicamente: "
+        read source
+        echo -n "Inserisci il percoorso di destinazione: "
+        read dest
+        echo "Eseguendo 'ln -s $source $dest': Crea un collegamento simbolico."
+        ln -s $source $dest
         ;; 
       "umask")
         UMASK_ATTUALE=$(umask)
@@ -454,10 +454,6 @@ case "$1" in
         echo "Eseguendo 'cal': Mostra il calendario."
         cal
         ;; 
-      "weather")
-        echo "Eseguendo 'curl wttr.in': Mostra le condizioni meteorologiche correnti."
-        curl wttr.in
-        ;; 
       "uname")
         echo "Eseguendo 'uname -a': Mostra le informazioni di sistema."
         uname -a
@@ -486,30 +482,6 @@ case "$1" in
         echo "Eseguendo 'arp -a': Mostra la tabella ARP."
         arp -a
         ;;
-      "psu")
-        echo "Eseguendo 'ps -u $USER': Mostra i processi dell'utente corrente."
-        ps -u $USER
-        ;;
-      "sar")
-        if ! command -v sar &> /dev/null
-        then
-          echo "sar could not be found"
-          echo "Please install it using: sudo apt install sysstat"
-          exit
-        fi
-        echo "Eseguendo 'sar -u 1 5': Mostra l'utilizzo della CPU negli ultimi 5 secondi."
-        sar -u 1 5
-        ;;
-      "lsof")
-        if ! command -v lsof &> /dev/null
-        then
-          echo "lsof could not be found"
-          echo "Please install it using: sudo apt install lsof"
-          exit
-        fi
-        echo "Eseguendo 'lsof': Mostra i file aperti."
-        lsof
-        ;;
       "lshw")
         if ! command -v lshw &> /dev/null
         then
@@ -533,8 +505,8 @@ case "$1" in
       "lspci")
         if ! command -v lspci &> /dev/null
         then
-          echo "lspci could not be found"
-          echo "Please install it using: sudo apt install pciutils"
+          echo "lspci non é stato trovato"
+          echo "Installalo usando: sudo apt install pciutils"
           exit
         fi
         echo "Eseguendo 'lspci': Mostra i dispositivi PCI."
@@ -543,8 +515,8 @@ case "$1" in
       "lsusb")
         if ! command -v lsusb &> /dev/null
         then
-          echo "lsusb could not be found"
-          echo "Please install it using: sudo apt install usbutils"
+          echo "lsusb non é stato trovato."
+          echo "Installalo usando: sudo apt install usbutils"
           exit
         fi
         echo "Eseguendo 'lsusb': Mostra i dispositivi USB."
@@ -562,35 +534,17 @@ case "$1" in
         echo "Eseguendo 'journalctl': Mostra il journal di sistema."
         journalctl
         ;;
-      "systemctl")
-        echo "Eseguendo 'systemctl': Mostra lo stato dei servizi di sistema."
-        systemctl
+      "prompt")
+        echo -n "Prompt della shell corrente: "
+        echo $PS1
         ;;
-      "timers")
-        echo "Eseguendo 'systemctl list-timers': Mostra i timer di sistema."
-        systemctl list-timers
+      "path")
+        echo -n "Percorso dal quale la shell cerca gli esecuibili: "
+        echo $PATH
         ;;
-      "sockets")
-        echo "Eseguendo 'systemctl list-sockets': Mostra i socket di sistema."
-        systemctl list-sockets
+      "bashrc")
+        vi ~/.bashrc
         ;;
-      "targets")
-        echo "Eseguendo 'systemctl list-units --type=target': Mostra i target di sistema."
-        systemctl list-units --type=target
-        ;;
-      "devices")
-        echo "Eseguendo 'systemctl list-units --type=device': Mostra i device di sistema."
-        systemctl list-units --type=device
-        ;;
-      "mounts")
-        echo "Eseguendo 'systemctl list-units --type=mount': Mostra i mount di sistema."
-        systemctl list-units --type=mount
-        ;;
-      "automounts")
-        echo "Eseguendo 'systemctl list-units --type=automount': Mostra gli automount di sistema."
-        systemctl list-units --type=automount
-        ;;
-
       esac
       ;;
 

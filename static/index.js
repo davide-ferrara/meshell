@@ -148,18 +148,7 @@ function setupCommandButtons() {
       if (!blacklist.includes(command)) {
         const activeTerminal = getActiveTerminal();
         if (activeTerminal) {
-          // if (
-          //   button.id === "cd" ||
-          //   button.id === "cdback" ||
-          //   button.id === "cdhome" ||
-          //   button.id === "cdroot" ||
-          //   button.id === "umask"
-          // ) {
-          //   // Important to use source or the script will be executed in a child process
-          //   activeTerminal.sendCommand(`source meshell --cmd ${command}`);
-          // } else {
           activeTerminal.sendCommand(`source meshell --cmd ${command}`);
-          // }
           scrollToTop();
         }
       }
@@ -173,13 +162,13 @@ function main() {
   labs = new Array();
   const lab1 = new Meshell("terminal-lab1");
   const lab2 = new Meshell("terminal-lab2");
-  const lab3 = new Meshell("terminal-lab3");
-  const lab4 = new Meshell("terminal-lab4");
+  // const lab3 = new Meshell("terminal-lab3");
+  // const lab4 = new Meshell("terminal-lab4");
 
   labs.push(lab1);
   labs.push(lab2);
-  labs.push(lab3);
-  labs.push(lab4);
+  // labs.push(lab3);
+  // labs.push(lab4);
 
   labs.forEach((lab) => {
     lab.openConnection();
