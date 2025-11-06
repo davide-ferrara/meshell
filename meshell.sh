@@ -195,47 +195,30 @@ case "$1" in
         ln -s $target $link_name
         ;; 
       "umask")
-        echo "=========================================================="
-        echo "          SPIEGAZIONE DEL COMANDO UMASK"
-        echo "=========================================================="
+        UMASK_ATTUALE=$(umask)
         echo "umask (User Mask) DEFINISCE i permessi di default per i nuovi file/directory."
-        echo ""
-        echo "FUNZIONAMENTO LOGICO:"
+        echo "--------------------------------------------------------"
         echo "UMASK SOTTRAE i permessi che NON vuoi che vengano assegnati, dai massimi permessi possibili."
         echo ""
         echo "   - Massimi per i FILE:      666 (rw-rw-rw-)"
         echo "   - Massimi per DIRECTORY:   777 (rwxrwxrwx)"
         echo ""
-        echo "=========================================================="
-        echo "1) Umask Attuale"
-        echo "=========================================================="
-        echo "Mostra la maschera di creazione dei file dell'utente ('umask'):"
-        echo "--------------------------------------------------------"
-        UMASK_ATTUALE=$(umask)
-        umask
-        echo "--------------------------------------------------------"
-        echo "L'umask corrente è: $UMASK_ATTUALE"
-        echo "--------------------------------------------------------"
-
         echo "Umask impostata a 022. Significa: togli il permesso di scrittura (2) al Gruppo e agli Altri."
         echo ""
         echo "   - Calcolo per DIRECTORY: 777 - 022 = 755 (rwxr-xr-x)"
         echo "   - Calcolo per FILE:      666 - 022 = 644 (rw-r--r--)"
         echo "--------------------------------------------------------"
+        echo "1) Umask Attuale"
+        echo "L'umask corrente è: $UMASK_ATTUALE"
+
         echo -n "Inserisci il valore della maschera (es. 022): "
         read mask
 
         if [ -z "$mask" ]; then
             echo "Errore: Nessun valore inserito. Umask non modificata."
             echo "Umask attuale rimane: $(umask)"
-        else
-            if umask "$mask" 2>/dev/null; then
-                echo "Umask impostata con successo su: $(umask)"
-            else
-                echo "Errore: '$mask' non e' una modalita' umask valida."
-                echo "Umask precedente non modificata."
-            fi
         fi
+            umask "$mask"
         ;; 
       "chmod")
         echo "Guida rapida ai Permessi (Formato Ottale UGO):"
