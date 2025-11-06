@@ -77,11 +77,11 @@ case "$1" in
         cd .. >> /dev/null
         ;; 
       "cdhome")
-        cd ~ >> /dev/null
-        ;;
+        cd ~ >/dev/null
+        ;
       "cdroot")
-        cd / >> /dev/null
-        ;;
+        cd / >/dev/null
+        ;
       "ls")
         echo "Eseguendo 'ls -la': Elenca i file e le directory con i dettagli."
         ls -la
