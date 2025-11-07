@@ -1,0 +1,96 @@
+\contentsline {section}{\numberline {1}Architettura Generale}{3}{section.1}%
+\contentsline {subsection}{\numberline {1.1}Installazione}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {1.2}Gestione dei permessi}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {1.3}Backend (server.go)}{4}{subsection.1.3}%
+\contentsline {subsection}{\numberline {1.4}Avvio e Routing}{4}{subsection.1.4}%
+\contentsline {subsection}{\numberline {1.5}La Sessione Terminale (tty handler)}{4}{subsection.1.5}%
+\contentsline {subsection}{\numberline {1.6}Connessione SSH (connectSSH)}{5}{subsection.1.6}%
+\contentsline {subsection}{\numberline {1.7}Creazione del PTY (setupSSHSession)}{5}{subsection.1.7}%
+\contentsline {subsection}{\numberline {1.8}Flusso Dati Bidirezionale (startPiping)}{6}{subsection.1.8}%
+\contentsline {subsection}{\numberline {1.9}Frontend (index.js)}{7}{subsection.1.9}%
+\contentsline {subsection}{\numberline {1.10}La Classe \texttt {Meshell}}{7}{subsection.1.10}%
+\contentsline {subsection}{\numberline {1.11}Connessione e Comunicazione}{7}{subsection.1.11}%
+\contentsline {subsection}{\numberline {1.12}Gestione dei Comandi Rapidi}{8}{subsection.1.12}%
+\contentsline {section}{\numberline {2}Meshell.sh}{8}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Struttura Principale}{8}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Comandi dall'Interfaccia Web (Amministrazione Guest)}{9}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Controlli Rapidi}{9}{subsubsection.2.2.1}%
+\contentsline {paragraph}{Clear Terminal}{9}{section*.2}%
+\contentsline {paragraph}{List (ls)}{9}{section*.3}%
+\contentsline {paragraph}{Navigazione (cd, pwd)}{9}{section*.4}%
+\contentsline {paragraph}{Cambia Utente (su)}{9}{section*.5}%
+\contentsline {paragraph}{Zoom (+/-)}{9}{section*.6}%
+\contentsline {paragraph}{Meshell Update}{9}{section*.7}%
+\contentsline {subsubsection}{\numberline {2.2.2}Gestione Pacchetti (Basati su APT)}{9}{subsubsection.2.2.2}%
+\contentsline {paragraph}{update}{9}{section*.8}%
+\contentsline {paragraph}{install}{10}{section*.9}%
+\contentsline {paragraph}{search}{10}{section*.10}%
+\contentsline {paragraph}{remove}{10}{section*.11}%
+\contentsline {subsubsection}{\numberline {2.2.3}Sistema}{10}{subsubsection.2.2.3}%
+\contentsline {paragraph}{top}{11}{section*.12}%
+\contentsline {paragraph}{ps}{11}{section*.13}%
+\contentsline {paragraph}{searchps}{11}{section*.14}%
+\contentsline {paragraph}{kill}{11}{section*.15}%
+\contentsline {paragraph}{uname}{11}{section*.16}%
+\contentsline {paragraph}{uptime}{11}{section*.17}%
+\contentsline {paragraph}{free}{11}{section*.18}%
+\contentsline {paragraph}{du}{11}{section*.19}%
+\contentsline {paragraph}{w}{12}{section*.20}%
+\contentsline {paragraph}{last}{12}{section*.21}%
+\contentsline {paragraph}{date}{12}{section*.22}%
+\contentsline {paragraph}{cal}{12}{section*.23}%
+\contentsline {paragraph}{shutdown}{12}{section*.24}%
+\contentsline {paragraph}{reboot}{12}{section*.25}%
+\contentsline {subsubsection}{\numberline {2.2.4}File System}{12}{subsubsection.2.2.4}%
+\contentsline {paragraph}{inode}{13}{section*.26}%
+\contentsline {paragraph}{mkdir}{13}{section*.27}%
+\contentsline {paragraph}{touch}{13}{section*.28}%
+\contentsline {paragraph}{tree}{13}{section*.29}%
+\contentsline {paragraph}{ln}{13}{section*.30}%
+\contentsline {paragraph}{umask}{13}{section*.31}%
+\contentsline {paragraph}{chmod}{13}{section*.32}%
+\contentsline {paragraph}{chown}{14}{section*.33}%
+\contentsline {paragraph}{find}{14}{section*.34}%
+\contentsline {paragraph}{file}{14}{section*.35}%
+\contentsline {subsubsection}{\numberline {2.2.5}Gestione Utenti}{14}{subsubsection.2.2.5}%
+\contentsline {paragraph}{showusers}{14}{section*.36}%
+\contentsline {paragraph}{showgroups}{14}{section*.37}%
+\contentsline {paragraph}{groups}{15}{section*.38}%
+\contentsline {paragraph}{useradd}{15}{section*.39}%
+\contentsline {paragraph}{groupadd}{15}{section*.40}%
+\contentsline {paragraph}{user-add-to-group}{15}{section*.41}%
+\contentsline {paragraph}{userdel}{15}{section*.42}%
+\contentsline {paragraph}{groupdel}{15}{section*.43}%
+\contentsline {paragraph}{user-remove-from-group}{16}{section*.44}%
+\contentsline {paragraph}{passwd}{16}{section*.45}%
+\contentsline {paragraph}{whoami}{16}{section*.46}%
+\contentsline {paragraph}{id}{16}{section*.47}%
+\contentsline {subsubsection}{\numberline {2.2.6}Network}{16}{subsubsection.2.2.6}%
+\contentsline {paragraph}{ping}{16}{section*.48}%
+\contentsline {paragraph}{wget}{16}{section*.49}%
+\contentsline {paragraph}{curl}{16}{section*.50}%
+\contentsline {paragraph}{ip}{17}{section*.51}%
+\contentsline {paragraph}{ifconfig}{17}{section*.52}%
+\contentsline {paragraph}{dig}{17}{section*.53}%
+\contentsline {paragraph}{host}{17}{section*.54}%
+\contentsline {paragraph}{hosts-edit}{17}{section*.55}%
+\contentsline {paragraph}{netstat}{17}{section*.56}%
+\contentsline {paragraph}{route}{17}{section*.57}%
+\contentsline {paragraph}{arp}{17}{section*.58}%
+\contentsline {subsubsection}{\numberline {2.2.7}Shell}{18}{subsubsection.2.2.7}%
+\contentsline {paragraph}{cd}{18}{section*.59}%
+\contentsline {paragraph}{ls}{18}{section*.60}%
+\contentsline {paragraph}{pwd}{18}{section*.61}%
+\contentsline {paragraph}{history}{18}{section*.62}%
+\contentsline {paragraph}{exit}{18}{section*.63}%
+\contentsline {subsubsection}{\numberline {2.2.8}Hardware}{18}{subsubsection.2.2.8}%
+\contentsline {paragraph}{lscpu}{19}{section*.64}%
+\contentsline {paragraph}{lsusb}{19}{section*.65}%
+\contentsline {paragraph}{lspci}{19}{section*.66}%
+\contentsline {paragraph}{lshw}{19}{section*.67}%
+\contentsline {paragraph}{lsblk}{19}{section*.68}%
+\contentsline {subsubsection}{\numberline {2.2.9}Kernel}{19}{subsubsection.2.2.9}%
+\contentsline {paragraph}{dmesg}{19}{section*.69}%
+\contentsline {paragraph}{lsmod}{19}{section*.70}%
+\contentsline {paragraph}{modinfo}{19}{section*.71}%
+\contentsline {section}{\numberline {3}Conclusioni}{20}{section.3}%

@@ -1,0 +1,1120 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\geometry{a4paper, top=3cm, bottom=3cm, left=3cm, right=3cm, heightrounded}
+
+% --- Stile per i blocchi di codice ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+  backgroundcolor=\color{backcolour},
+  commentstyle=\color{codegreen},
+  keywordstyle=\color{magenta},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,
+  breaklines=true,
+  captionpos=b,
+  keepspaces=true,
+  numbers=left,
+  numbersep=5pt,
+  showspaces=false,
+  showstringspaces=false,
+  showtabs=false,
+  tabsize=2
+}
+\lstset{style=mystyle}
+
+\title{Tesi Laboratorio di amministrazione dei Sistemi \\ MeShell}
+\author{Davide Ferrara 518629}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+    MeShell è una piattaforma per l'amministrazione remota di sistemi basata sul web.
+    \newline Esse fornisce uno o piú terminali SSH accessibili tramite browser,
+    arricchito da una serie di comandi rapidi pensati per semplificare le operazioni comuni di un amministratore di sistema.
+    Questa relazione analizza in modo approfondito l'architettura di MeShell, dissezionando il codice sorgente del backend in Go,
+    del frontend in JavaScript e dello script meshell.sh per fornire una comprensione completa del suo funzionamento interno,
+    con un focus specifico sulle pratiche di amministrazione di sistema.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Architettura Generale}
+MeShell segue un'architettura client-server a tre livelli:
+\begin{enumerate}
+    \item \textbf{Frontend Web:} Un'interfaccia utente (UI) reattiva che l'amministratore di sistema utilizza tramite un qualsiasi browser moderno.
+    \item \textbf{Backend Server:} Un server monolitico scritto in Go che funge da cuore del sistema. Ha il duplice ruolo di web server per il frontend e di gateway WebSocket per la comunicazione in tempo reale. La sua responsabilità principale è orchestrare le sessioni SSH verso le macchine remote.
+    \item \textbf{Meshell.sh :} Su ogni macchina risiede lo script \texttt{meshell.sh}, un componente chiave che astrae comandi complessi in scorciatoie semplici.
+\end{enumerate}
+
+\subsection{Installazione}
+Per utilizzare Meshell é necessario innanzi tutto clonare il repository tramite:
+
+\begin{lstlisting}{bash}
+    git clone https://github.com/davide-ferrara/meshell.git
+    cd meshell
+\end{lstlisting}
+
+Successivamente é necessario intallare le dipendenze:
+\begin{lstlisting}
+    go mod tidy
+    npm install
+\end{lstlisting}
+
+Fatto ció per avviare il Server Web basterá eseguire:
+\begin{lstlisting}
+    npm run dev
+\end{lstlisting}
+
+All'interno dei nostri client invece basterá installare lo script Meshell eseguendo:
+\begin{lstlisting}
+   chmod +x install.sh 
+   ./install.sh
+\end{lstlisting}
+
+Il seguente script creerá un link simbolico in /usr/bin che permetterá si eseguite i vari comandi Meshell all'interno dei client.
+\begin{lstlisting}{go}
+    origin="$(pwd)/meshell.sh"
+    dest="/usr/local/bin/meshell"
+
+    sudo ln -sf "$origin" "$dest"
+    for f in bin/*; do
+    sudo ln -sf "$(pwd)/$f" "/usr/local/bin/$(basename "$f")"
+    done
+\end{lstlisting}
+
+Sará possibile visualizzare Meshell all'indirizzo "\textbf{http://localhost:5173/}".\newline
+La directory di installazione di default di Meshell é \textbf{/usr/share/meshell}.
+
+\subsection{Gestione dei permessi}
+La gestione dei permessi é un punto cruciale dell'applicazione.
+Mettiamo caso che Meshell venga utilizzato all'interno di un laboratorio universitario composto da
+diverse macchine Linux e che lo script Meshell sia installato in ognuna di queste.
+Supponiamo anche che ogni macchina sia caratterizzata da almeno due gruppi: "\textbf{Admin}" e "\textbf{Studenti}".
+É importante assicurarsi che il proprietario (\textbf{owner}) della cartella \textit{"usr/share/meshell/"} sia un utente
+appartente al gruppo "Admin" e non "Studenti" in modo tale che gli script non possano essere modificati da utenti diversi dall'amministratore di sistema.\newline
+
+É possibile fare ció utilizzando i comandi:
+\begin{lstlisting}{go}
+   # Visualizza i permessi
+   ls -l /usr/share/meshell 
+   # Nel caso sia proprietario il gruppo Studenti
+   chown -R admin1:admin /usr/share/meshell
+\end{lstlisting}
+
+
+\subsection{Backend (server.go)}
+Il server, scritto in Go, è il componente centrale che permette di visualizzare via web
+tramite protocolli (HTTP/WebSocket) un terminal (SSH).
+
+\subsection{Avvio e Routing}
+Il punto di ingresso dell'applicazione è la funzione \texttt{main}, che
+inizializza il server HTTP e imposta il routing.
+\begin{lstlisting}[language=Go]
+func main() {
+    flag.Parse()
+    log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+
+    log.Println("Meshell Server is starting...")
+
+    http.HandleFunc("/tty", tty)
+    http.HandleFunc("/", home)
+    http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+  
+    log.Printf("Server listening on address %s", *addr)
+    err := http.ListenAndServe(*addr, nil)
+    if err != nil {
+        log.Fatalf("Fatal error: %v", err)
+    }
+}
+\end{lstlisting}
+Oltre a servire i file statici (CSS, immagini), il router definisce due handler
+principali:
+\begin{itemize}
+    \item \texttt{home}: Gestisce la rotta radice \texttt{/} e serve il file \texttt{index.html}.
+    \item \texttt{tty}: Gestisce la rotta \texttt{/tty}, questo é l'endpoint che effettua l'upgrade della connessione da HTTP a WebSocket e permette a Xterm.js il flusso dei dati dal pty.
+\end{itemize}
+
+\subsection{La Sessione Terminale (tty handler)}
+Quando il frontend invia una richiesta all'endpoint \texttt{/tty}, l'handler esegue una
+sequenza di operazioni critiche che stabilisce la sessione interattiva, ovvero un flusso bidirezionale di byte interpretati successivamente in caratteri.
+In seguito le principali operazioni che svolge il server:
+\begin{enumerate}
+    \item \textbf{Apertura WebSocket:} Utilizzando la libreria \texttt{gorilla/websocket} la connessione HTTP iniziale viene trasformata in una connessione WebSocket bidirezionale.
+    \item \textbf{Connessione SSH:} Invoca la funzione \texttt{connectSSH} per stabilire una connessione SSH con le macchine remote, utilizzando credenziali pre-configurate.
+    \item \textbf{Setup della Sessione PTY:} Chiama \texttt{setupSSHSession} per richiedere uno pseudo-terminale (PTY) e avviare una shell remota.
+    \item \textbf{Avvio del Piping:} Infine, \texttt{startPiping} avvia le goroutine necessarie per inoltrare i dati in entrambe le direzioni: dal WebSocket allo stdin della shell SSH e dallo stdout/stderr della shell SSH di nuovo al WebSocket.
+\end{enumerate}
+In Linux la maggior parte degli \textbf{Emulatori di Terminale} (come gnome-terminal o alacritty) utilizzano una shell come \textbf{Bash} per eseguire comandi e script.
+Esistono poi anche altre varianti di shell, come ad esempio Fish.\newline
+Bash non è altro che un programma, che è possibile eseguire da \textbf{/bin/bash}, ma come fa l'Emulatore di Terminale a comunicare con esso?
+
+Dopo l'avvio, l'Emulatore di Terminale richiede al kernel (aprendo /dev/ptmx) un nuovo pseudoterminale.
+Il kernel gli restituisce un file descriptor (l'handler) per il \textbf{PTM (Pseudo Terminal Master)}, che farà da "pipe" verso l'altro capo, il \textbf{PTS (Pseudo Terminal Slave)}.
+
+Il PTS è un file contenuto in /dev/pts/ (es. /dev/pts/5). Questo file verrà usato dalla shell (bash) che l'emulatore avvia
+trmaite \textbf{fork()} per creare un processo figlio.\newline
+Questo processo figlio, prima di trasformarsi in bash (tramite exec()), imposta i suoi \textbf{STDIN}, \textbf{STDOUT} e \textbf{STDERR} al file \textbf{PTS} (es. /dev/pts/5) ed in questo modo il processo padre "Terminale" e il processo figlio "Bash"
+avranno stabilito una comunicazione bidirezionale detta anche \textbf{IPC}.
+
+\begin{lstlisting}
+    ~ > pstree
+    systemd
+    |            ... 
+    |
+    |-alacritty---bash---pstree 
+    |            
+    |
+\end{lstlisting}
+
+Da questo output del comando pstree possiamo vedere come il Terminal Emulator, abbia come figli Bash e pstree che é il comando eseguito.
+La logica di Meshell é proprio questa, il nostro frontend é il Terminal Emulator (un ambiente grafico), il Server Go non é altro che il ponte
+(come il kernel) e il client SSH il PTY.
+
+\subsection{Connessione SSH (connectSSH)}
+Questa funzione astrae la logica di connessione SSH.
+\begin{lstlisting}[language=Go]
+func connectSSH(user string, password string, addr string) (*ssh.Client, error) {
+    // ... (gestione home dir)
+    khPath := filepath.Join(home, ".ssh", "known_hosts")
+    hostKeyCallback, err := knownhosts.New(khPath)
+    if err != nil {
+       // Host Sconosciuto 
+    }
+
+    config := &ssh.ClientConfig{
+        User: user,
+        Auth: []ssh.AuthMethod{
+            ssh.Password(password),
+        },
+        HostKeyCallback: hostKeyCallback,
+    }
+
+    return ssh.Dial("tcp", addr, config)
+}
+\end{lstlisting}
+Dal punto di vista della sicurezza, è importante notare il meccanismo di
+\texttt{HostKeyCallback}. Il codice tenta di utilizzare il file
+\texttt{.ssh/known\_hosts} per verificare l'identità del server remoto,
+proteggendo da attacchi man-in-the-middle.
+
+\subsection{Creazione del PTY (setupSSHSession)}
+Questa è la funzione dove viene creato l'ambiente terminale interattivo.
+\begin{lstlisting}[language=Go]
+func setupSSHSession(client *ssh.Client, rows int, cols int) (*ssh.Session, io.WriteCloser, io.Reader, io.Reader, error) {
+    session, err := client.NewSession()
+    // ...
+    sshStdin, _ := session.StdinPipe()
+    sshStdout, _ := session.StdoutPipe()
+    sshStderr, _ := session.StderrPipe()
+
+    modes := ssh.TerminalModes{
+        ssh.ECHO:          1, // Abilita l'eco dei caratteri
+        ssh.TTY_OP_ISPEED: 14400, // Velocita di input
+        ssh.TTY_OP_OSPEED: 14400, // Velocita di output
+    }
+
+    if err := session.RequestPty("xterm", rows, cols, modes); err != nil {
+        // ...
+    }
+
+    if err := session.Shell(); err != nil {
+        // ...
+    }
+
+    return session, sshStdin, sshStdout, sshStderr, nil
+}
+\end{lstlisting}
+La chiamata a \texttt{session.RequestPty} è fondamentale. Chiede al server SSH
+di allocare uno pseudo-terminale, specificando il tipo di emulazione
+(\texttt{"xterm"}) e le dimensioni. Senza un PTY, non sarebbe possibile avere
+una shell interattiva, ma solo eseguire comandi singoli. Subito dopo,
+\texttt{session.Shell()} avvia la shell remota associata a questo PTY.
+
+\subsection{Flusso Dati Bidirezionale (startPiping)}
+Questa funzione orchestra il flusso di dati tra il client web e la shell remota
+tramite tre goroutine concorrenti.
+\begin{lstlisting}[language=Go]
+func startPiping(ws *websocket.Conn, sshStdin io.WriteCloser, sshStdout, sshStderr io.Reader, sshSession *ssh.Session) error {
+    var wg sync.WaitGroup
+    wg.Add(3)
+
+    // Goroutine 1: WebSocket -> SSH Stdin
+    go func() {
+        // ... (legge dal ws e scrive su sshStdin)
+    }()
+
+    // Goroutine 2: SSH Stdout -> WebSocket
+    writer := &websocketWriter{ws: ws}
+    go func() { defer wg.Done(); copyStream(writer, sshStdout) }()
+
+    // Goroutine 3: SSH Stderr -> WebSocket
+    go func() { defer wg.Done(); copyStream(writer, sshStderr) }()
+
+    err := sshSession.Wait()
+    wg.Wait()
+    return err
+}
+\end{lstlisting}
+La prima goroutine legge i messaggi dal WebSocket (input dell'utente) e li
+scrive nello \texttt{stdin} della sessione SSH. Gestisce anche i messaggi
+speciali di "resize" per ridimensionare il PTY. Le altre due goroutine leggono
+continuamente da \texttt{stdout} e \texttt{stderr} della sessione SSH e
+scrivono ogni dato ricevuto nel WebSocket, inviandolo così al browser
+dell'utente.
+
+\newpage
+\subsection{Frontend (index.js)}
+Il frontend si occupa di presentare l'interfaccia all'utente e di gestire la
+comunicazione con il backend.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{gallery1.png}
+    \caption{Interfaccia Web di MeShell}
+    \label{fig:Meshell}
+\end{figure}
+
+\subsection{La Classe \texttt{Meshell}}
+Il codice è organizzato attorno a una classe \texttt{Meshell}, che incapsula la logica per un singolo terminale.
+\begin{lstlisting}
+class Meshell {
+  constructor(tname) {
+    this.tname = tname;
+    this.ws = null;
+    this.fitAddon = new FitAddon();
+
+    this.term = new Terminal({
+      cursorBlink: true,
+      fontSize: 18,
+      // ... altre opzioni
+    });
+    this.term.open(document.getElementById(this.tname));
+    this.term.loadAddon(this.fitAddon);
+
+    // ... (gestione eventi)
+  }
+  // ... metodi
+}
+\end{lstlisting}
+Il costruttore inizializza un'istanza della libreria \texttt{xterm.js}, la
+configura con un tema e un font, e la collega a un elemento \texttt{<div>}
+nell'HTML. Carica anche l'addon \texttt{FitAddon}, essenziale per far sì che il
+terminale si adatti alle dimensioni della finestra.
+
+\subsection{Connessione e Comunicazione}
+Il metodo \texttt{openConnection} è responsabile di stabilire la connessione
+WebSocket.
+\begin{lstlisting}
+  openConnection() {
+    // ...
+    const socketURL = `ws://${location.host}/tty?rows=${rows}&cols=${cols}`;
+    this.ws = new WebSocket(socketURL);
+
+    this.ws.onopen = () => {
+      this.term.focus();
+      this.term.onData((data) => {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(data);
+        }
+      });
+    };
+
+    this.ws.onmessage = (event) => {
+      this.term.write(new Uint8Array(event.data));
+    };
+    // ...
+  }
+\end{lstlisting}
+ahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
+Quando la connessione è aperta (\texttt{onopen}), il terminale riceve il focus
+e viene attivato l'handler \texttt{onData}. Da questo momento, ogni tasto
+premuto dall'utente viene inviato al server. Viceversa, ogni messaggio ricevuto
+dal server (\texttt{onmessage}) viene scritto direttamente nel terminale con
+\texttt{term.write()}, che si occupa di interpretare i dati e visualizzarli.
+
+\subsection{Gestione dei Comandi Rapidi}
+La funzione \texttt{setupCommandButtons} collega i pulsanti HTML all'invio di
+comandi.
+\begin{lstlisting}
+function setupCommandButtons() {
+  const commandButtons = document.querySelectorAll(".button-panel > button");
+
+  commandButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const command = button.id;
+      // ...
+      activeTerminal.sendCommand(`source meshell --cmd ${command}`);
+      // ...
+    });
+  });
+}
+\end{lstlisting}
+Per ogni pulsante, viene aggiunto un listener che, al click, recupera l'ID del
+pulsante (es. \texttt{"ps"}, \texttt{"update"}) e lo usa per costruire la
+stringa di comando \texttt{source meshell --cmd <id>}. Questa stringa viene poi
+inviata al terminale attivo tramite il metodo \texttt{sendCommand}.
+
+\section{Meshell.sh}
+Questo script Bash è un componente fondamentale che agisce come un dispatcher
+di comandi sulla macchina remota. Viene invocato con \texttt{source} per
+garantire che comandi come \texttt{cd} modifichino la shell corrente.
+
+\subsection{Struttura Principale}
+Lo script utilizza un costrutto \texttt{case} per interpretare il secondo
+argomento (\texttt{\$2}) passato dopo l'opzione \texttt{--cmd}.
+\begin{lstlisting}[language=bash]
+case "$1" in
+  "--cmd")
+    case $2 in
+      "ps")
+        # ... codice per ps ...
+        ;;
+      "update")
+        # ... codice per update ...
+        ;;
+      # ... tutti gli altri comandi
+    esac
+    ;;
+  # ... altre opzioni come start, stop, etc.
+esac
+\end{lstlisting}
+
+\subsection{Comandi dall'Interfaccia Web (Amministrazione Guest)}
+
+\subsubsection{Controlli Rapidi}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{quick-controls.png}
+    \caption{Interfaccia dei Controlli Rapidi}
+    \label{fig:quickcontrols}
+\end{figure}
+
+\paragraph{Clear Terminal} Pulisce la schermata del terminale corrente. È un comando standard della shell.
+
+\paragraph{List (ls)} Elenca i file e le directory nella posizione corrente. Lo script
+\texttt{meshell.sh} usa l'alias \texttt{ls -la} per fornire un output
+dettagliato.
+\begin{lstlisting}[language=bash]
+"ls")
+    ls -la
+    ;;
+\end{lstlisting}
+
+\paragraph{Navigazione (cd, pwd)} I comandi \texttt{cd} (Change Directory) e \texttt{pwd} (Print Working
+Directory) sono gestiti per permettere una navigazione di base. I pulsanti
+rapidi offrono scorciatoie per le directory \texttt{..} (parente), \texttt{\~}
+(home) e \texttt{/} (root).
+\begin{lstlisting}[language=bash]
+"cd")
+    echo -n "Inserisci il percorso: "
+    read path
+    cd $path
+    ;;
+"pwd")
+    pwd
+    ;;
+\end{lstlisting}
+
+\paragraph{Cambia Utente (su)} Il comando \texttt{su -} permette di cambiare l'utente corrente, richiedendo la
+password dell'utente di destinazione. È un comando standard di sistema.
+
+\paragraph{Zoom (+/-)} Questi controlli sono una funzionalità del frontend e non vengono inviati al
+server. Permettono di aumentare o diminuire la dimensione del font nel
+terminale per migliorare la leggibilità, agendo direttamente sulla
+configurazione di Xterm.js.
+\paragraph{Meshell Update} Questo comando aggiorna lo script \texttt{meshell.sh} stesso, eseguendo un
+\texttt{git pull} dalla directory in cui è stato clonato il repository.
+\begin{lstlisting}[language=bash]
+"meshell-update")
+    # ... (codice per l'aggiornamento)
+    ;;
+\end{lstlisting}
+
+\subsubsection{Gestione Pacchetti (Basati su APT)}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{package-managment.png}
+    \caption{Interfaccia di Gestione Pacchetti}
+    \label{fig:packagemanagement}
+\end{figure}
+
+\paragraph{update} Questo comando esegue l'aggiornamento completo del sistema, sincronizzando
+prima la lista dei pacchetti e poi installando le nuove versioni disponibili.
+\begin{lstlisting}[language=bash]
+"update")
+    echo "Eseguendo 'sudo apt update && sudo apt upgrade'..."
+    sudo apt update && sudo apt -y upgrade
+    ;;
+  \end{lstlisting}
+
+\paragraph{install} Permette all'amministratore di installare un nuovo pacchetto. Il comando è
+interattivo e richiede di inserire il nome del pacchetto da installare.
+\begin{lstlisting}[language=bash]
+"install")
+    echo -n "Inserisci il nome del pacchetto da installare: "
+    read package
+    echo "Eseguendo 'sudo apt install $package'..."
+    sudo apt install -y $package
+    ;;
+\end{lstlisting}
+
+\paragraph{search} Cerca un pacchetto nei repository configurati, utile per trovare il nome
+corretto di un software prima dell'installazione.
+\begin{lstlisting}[language=bash]
+"search")
+    echo -n "Inserisci il nome del pacchetto da cercare: "
+    read package
+    echo "Eseguendo 'apt search $package'..."
+    apt search $package
+    ;;
+\end{lstlisting}
+
+\paragraph{remove} Rimuove un pacchetto installato dal sistema.
+\begin{lstlisting}[language=bash]
+"remove")
+    echo -n "Inserisci il nome del pacchetto da rimuovere: "
+    read package
+    echo "Eseguendo 'sudo apt remove $package'..."
+    sudo apt remove -y $package
+    ;;
+\end{lstlisting}
+
+\subsubsection{Sistema}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{system.png}
+    \caption{Interfaccia dei Comandi di Sistema}
+    \label{fig:system}
+\end{figure}
+
+\paragraph{top} Avvia il tool interattivo \texttt{top}, che fornisce una vista in tempo reale
+dei processi in esecuzione e del consumo di risorse.
+\begin{lstlisting}[language=bash]
+"top")
+    echo "Eseguendo 'top': Mostra i processi in esecuzione..."
+    top
+    ;;
+\end{lstlisting}
+
+\paragraph{ps} Mostra i processi attivi in una struttura ad albero (\texttt{--forest}) per
+visualizzare le relazioni padre-figlio.
+\begin{lstlisting}[language=bash]
+"ps")
+    echo "Eseguendo 'ps aux --forest': Mostra i processi..."
+    ps aux --forest
+    ;;
+\end{lstlisting}
+
+\paragraph{searchps} Cerca un processo specifico tramite \texttt{grep}. Richiede interattivamente il
+nome all'utente.
+\begin{lstlisting}[language=bash]
+"searchps")
+    echo "Eseguendo 'ps aux | grep \$name': Mostra i processi..."
+    read -p "Nome del processo da cercare: " psname
+    ps aux | grep $psname
+    ;;
+\end{lstlisting}
+
+\paragraph{kill} Termina un processo. Richiede interattivamente il Process ID (PID) da
+terminare.
+\begin{lstlisting}[language=bash]
+"kill")
+    echo -n "Inserisci l'ID del processo da terminare: "
+    read pid
+    echo "Eseguendo 'kill $pid': Termina il processo..."
+    kill $pid
+    ;;
+\end{lstlisting}
+
+\paragraph{uname} Fornisce informazioni dettagliate sul sistema, inclusa la versione del kernel,
+il nome host e l'architettura.
+\begin{lstlisting}[language=bash]
+"uname")
+    echo "Eseguendo 'uname -a': Mostra le informazioni di sistema."
+    uname -a
+    ;;
+\end{lstlisting}
+
+\paragraph{uptime} Mostra da quanto tempo il sistema e in esecuzione in un formato leggibile e
+amichevole.
+\begin{lstlisting}[language=bash]
+"uptime")
+    echo "Eseguendo 'uptime -p': Mostra da quanto tempo il sistema e attivo."
+    uptime -p
+    ;;
+\end{lstlisting}
+
+\paragraph{free} Mostra l'utilizzo della memoria RAM e dell'area di swap in un formato leggibile
+(human-readable).
+\begin{lstlisting}[language=bash]
+"free")
+    echo "Eseguendo 'free -h': Mostra l'utilizzo della memoria..."
+    free -h
+    ;;
+\end{lstlisting}
+
+\paragraph{du} Mostra l'utilizzo dello spazio su disco per la directory corrente in formato
+leggibile.
+\begin{lstlisting}[language=bash]
+"du")
+    echo "Eseguendo 'du -h': Mostra l'utilizzo dello spazio su disco..."
+    du -h
+    ;;
+\end{lstlisting}
+
+\paragraph{w} Mostra chi e attualmente loggato nel sistema e cosa sta facendo.
+\begin{lstlisting}[language=bash]
+"w")
+    echo "Eseguendo 'w': Mostra chi e loggato."
+    w
+    ;;
+\end{lstlisting}
+
+\paragraph{last} Mostra un elenco degli ultimi accessi (login) al sistema.
+\begin{lstlisting}[language=bash]
+"last")
+    echo "Eseguendo 'last -n 10': Mostra gli ultimi 10 login."
+    last -n 10
+    ;;
+\end{lstlisting}
+
+\paragraph{date} Mostra la data e l'ora correnti del sistema.
+\begin{lstlisting}[language=bash]
+"date")
+    echo "Eseguendo 'date': Mostra la data e l'ora correnti."
+    date
+    ;;
+\end{lstlisting}
+
+\paragraph{cal} Mostra un semplice calendario del mese corrente.
+\begin{lstlisting}[language=bash]
+"cal")
+    echo "Eseguendo 'cal': Mostra il calendario."
+    cal
+    ;;
+\end{lstlisting}
+
+\paragraph{shutdown} Arresta il sistema. Tipicamente richiede privilegi di superutente.
+\begin{lstlisting}[language=bash]
+"shutdown")
+    echo "Eseguendo 'shutdown': Arresta il sistema."
+    shutdown
+    ;;
+\end{lstlisting}
+
+\paragraph{reboot} Riavvia il sistema. Tipicamente richiede privilegi di superutente.
+\begin{lstlisting}[language=bash]
+"reboot")
+    echo "Eseguendo 'reboot': Riavvia il sistema."
+    reboot
+    ;;
+\end{lstlisting}
+
+\subsubsection{File System}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{filesystem.png}
+    \caption{Interfaccia dei Comandi per il File System}
+    \label{fig:filesystem}
+\end{figure}
+
+\paragraph{inode} Elenca i file e le directory nella posizione corrente, mostrando il loro numero
+di inode, utile per diagnosi a basso livello del file system.
+\begin{lstlisting}[language=bash]
+"inode")
+    echo "Eseguendo 'ls -li': Elenca i file... con gli inode."
+    ls -li
+    ;;
+\end{lstlisting}
+
+\paragraph{mkdir} Crea una nuova directory. Il nome viene richiesto interattivamente.
+\begin{lstlisting}[language=bash]
+"mkdir")
+    echo -n "Inserisci il nome della cartella da creare: "
+    read folder_name
+    echo "Eseguendo 'mkdir $folder_name'..."
+    mkdir $folder_name
+    ;;
+\end{lstlisting}
+
+\paragraph{touch} Crea un file vuoto, utile per testare permessi o per script che necessitano
+della preesistenza di un file.
+\begin{lstlisting}[language=bash]
+"touch")
+    echo -n "Inserisci il nome del file da creare: "
+    read filename
+    echo "Eseguendo 'touch $filename'..."
+    touch $filename
+    ;;
+\end{lstlisting}
+
+\paragraph{tree} Mostra la struttura delle directory in formato ad albero, con una profondità
+specificata dall'utente.
+\begin{lstlisting}[language=bash]
+"tree")
+    read -p "Fino a che livello vuoi scendere? " n
+    if [[ -z "$n" ]]; then
+      tree -L 1
+    fi
+    tree -L $n
+    ;;
+\end{lstlisting}
+
+\paragraph{ln} Crea un link simbolico (symlink) da un file sorgente a una destinazione.
+\begin{lstlisting}[language=bash]
+"ln")
+    echo -n "Inserisci il file da linkare simbolicamente: "
+    read source
+    echo -n "Inserisci il percorso di destinazione: "
+    read dest
+    echo "Eseguendo 'ln -s $source $dest'..."
+    ln -s $source $dest
+    ;;
+\end{lstlisting}
+
+\paragraph{umask} Comando educativo che spiega il funzionamento della umask e permette di
+impostarne un nuovo valore per la sessione corrente.
+\begin{lstlisting}[language=bash]
+"umask")
+    # ... (codice che mostra guida e chiede input)
+    umask "$mask"
+    ;;
+\end{lstlisting}
+
+\paragraph{chmod} Guida interattiva per la modifica dei permessi di un file, spiegando il formato
+ottale prima di eseguire il comando.
+\begin{lstlisting}[language=bash]
+"chmod")
+    # ... (codice che mostra guida e chiede input)
+    chmod $permissions "$filename"
+    ;;
+\end{lstlisting}
+
+\paragraph{chown} Cambia il proprietario e/o il gruppo di un file o di una directory. Richiede
+privilegi di superutente.
+\begin{lstlisting}[language=bash]
+"chown")
+    # ... (codice che chiede input)
+    sudo chown -R $owner:$group $filename
+    ;;
+\end{lstlisting}
+
+\paragraph{find} Cerca file all'interno di un dato percorso, basandosi sul nome.
+\begin{lstlisting}[language=bash]
+"find")
+    echo -n "Inserisci il percorso in cui cercare: "
+    read path
+    echo -n "Inserisci il nome del file da cercare: "
+    read filename
+    echo "Eseguendo 'find $path -name $filename'..."
+    find $path -name $filename
+    ;;
+\end{lstlisting}
+
+\paragraph{file} Determina il tipo di un file (es. testo ASCII, eseguibile, immagine).
+\begin{lstlisting}[language=bash]
+"file")
+    echo -n "Inserisci il nome del file: "
+    read filename
+    echo "Eseguendo 'file $filename'..."
+    file $filename
+    ;;
+\end{lstlisting}
+
+\subsubsection{Gestione Utenti}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{user-managment.png}
+    \caption{Interfaccia di Gestione Utenti}
+    \label{fig:usermanagement}
+\end{figure}
+
+\paragraph{showusers} Mostra tutti gli utenti non di sistema, filtrando per UID >= 1000 dal file
+\texttt{/etc/passwd}.
+\begin{lstlisting}[language=bash]
+"showusers")
+    echo "Utenti del sistema con UID >= 1000..."
+    awk -F: '($3 >= 1000) {print $1}' /etc/passwd
+    ;;
+\end{lstlisting}
+
+\paragraph{showgroups} Mostra tutti i gruppi non di sistema, filtrando per GID >= 1000 dal file
+\texttt{/etc/group}.
+\begin{lstlisting}[language=bash]
+"showgroups")
+    echo "Gruppi del sistema con UID >= 1000..."
+    awk -F: '($3 >= 1000) {print $1}' /etc/group
+    ;;
+\end{lstlisting}
+
+\paragraph{groups} Mostra i gruppi a cui l'utente corrente appartiene.
+\begin{lstlisting}[language=bash]
+"groups")
+    echo -n "Gruppi a cui appartiene $(whoami): "
+    groups
+    ;;
+\end{lstlisting}
+
+\paragraph{useradd} Crea un nuovo utente nel sistema, creando la sua home directory (\texttt{-m}) e
+impostando \texttt{/bin/bash} come shell di default (\texttt{-s}). Richiede poi
+di impostare una password.
+\begin{lstlisting}[language=bash]
+"useradd")
+    echo -n "Inserisci il nome utente da creare: "
+    read username
+    echo "Eseguendo 'sudo useradd -m -s /bin/bash $username'..."
+    sudo useradd -m -s /bin/bash $username
+    echo "Ora imposta la password per $username:"
+    sudo passwd $username
+    ;;
+\end{lstlisting}
+
+\paragraph{groupadd} Crea un nuovo gruppo di utenti.
+\begin{lstlisting}[language=bash]
+"groupadd")
+    echo -n "Inserisci il nome del gruppo da creare: "
+    read group_name
+    echo "Eseguendo 'sudo groupadd $group_name'..."
+    sudo groupadd $group_name
+    ;;
+\end{lstlisting}
+
+\paragraph{user-add-to-group} Aggiunge un utente esistente a un gruppo esistente.
+\begin{lstlisting}[language=bash]
+"user-add-to-group")
+    echo -n "Inserisci il nome dell'utente da aggiungere al gruppo: "
+    read user
+    echo -n "Inserisci il nome del gruppo: "
+    read group
+    echo "Eseguendo 'sudo usermod -aG $group $user'..."
+    sudo usermod -aG $group $user
+    ;;
+\end{lstlisting}
+
+\paragraph{userdel} Elimina un utente dal sistema, forzando la rimozione (\texttt{-f}) e
+cancellando la sua home directory (\texttt{-r}).
+\begin{lstlisting}[language=bash]
+"userdel")
+    echo -n "Inserisci il nome utente da eliminare: "
+    read username
+    echo "Eseguendo 'sudo userdel -fr $username'..."
+    sudo userdel -fr $username
+    ;;
+\end{lstlisting}
+
+\paragraph{groupdel} Elimina un gruppo di utenti.
+\begin{lstlisting}[language=bash]
+"groupdel")
+    echo -n "Inserisci il nome del gruppo da eliminare: "
+    read group_name
+    echo "Eseguendo 'sudo groupdel $group_name'..."
+    sudo groupdel $group_name
+    ;;
+\end{lstlisting}
+
+\paragraph{user-remove-from-group} Rimuove un utente da un gruppo specifico.
+\begin{lstlisting}[language=bash]
+"user-remove-from-group")
+    echo -n "Inserisci il nome dell'utente da rimuovere: "
+    read user
+    echo -n "Inserisci il nome del gruppo: "
+    read group
+    echo "Eseguendo 'gpasswd -d $user $group'..."
+    sudo gpasswd -d $user $group
+    ;;
+\end{lstlisting}
+
+\paragraph{passwd} Permette all'utente corrente di cambiare la propria password.
+\begin{lstlisting}[language=bash]
+"passwd")
+    echo "Passwd permette di cambiare la password dell'utente corrente."
+    passwd
+    ;;
+\end{lstlisting}
+
+\paragraph{whoami} Mostra il nome dell'utente attualmente loggato.
+\begin{lstlisting}[language=bash]
+"whoami")
+    echo "Eseguendo 'whoami': Mostra l'utente corrente."
+    whoami
+    ;;
+\end{lstlisting}
+
+\paragraph{id} Mostra l'identità dell'utente corrente, inclusi UID, GID e i gruppi di
+appartenenza.
+\begin{lstlisting}[language=bash]
+"id")
+    echo "Eseguendo 'id': Mostra l'ID dell'utente e del gruppo."
+    id
+    ;;
+\end{lstlisting}
+
+\subsubsection{Network}
+
+% \begin{figure}[h!]
+% 	\centering
+% 	\includegraphics[width=0.8\textwidth]{network.png}
+% 	\caption{Interfaccia dei Comandi di Rete}
+% 	\label{fig:network}
+% \end{figure}
+
+\paragraph{ping} Invia pacchetti ICMP a un host per verificarne la raggiungibilità e misurare la
+latenza.
+\begin{lstlisting}[language=bash]
+"ping")
+    echo -n "Inserisci l'host da pingare: "
+    read host
+    echo "Eseguendo 'ping $host'..."
+    ping $host
+    ;;
+\end{lstlisting}
+
+\paragraph{wget} Scarica file da un URL specificato.
+\begin{lstlisting}[language=bash]
+"wget")
+    echo -n "Inserisci l'URL da scaricare: "
+    read url
+    echo "Eseguendo 'wget $url'..."
+    wget $url
+    ;;
+\end{lstlisting}
+
+\paragraph{curl} Trasferisce dati da o verso un server, usando vari protocolli. Utile per
+testare API.
+\begin{lstlisting}[language=bash]
+"curl")
+    echo -n "Inserisci l'URL da scaricare: "
+    read url
+    echo "Eseguendo 'curl $url'..."
+    curl $url
+    ;;
+\end{lstlisting}
+
+\paragraph{ip} Comando moderno per visualizzare e manipolare routing, dispositivi, policy e
+tunnel.
+\begin{lstlisting}[language=bash]
+"ip")
+    echo "Eseguendo 'ip a': Mostra le informazioni sull'interfaccia di rete."
+    ip a
+    ;;
+\end{lstlisting}
+
+\paragraph{ifconfig} Comando legacy per la configurazione delle interfacce di rete.
+\begin{lstlisting}[language=bash]
+"ifconfig")
+    echo "Eseguendo 'ifconfig': Mostra le informazioni sull'interfaccia di rete."
+    ifconfig
+    ;;
+\end{lstlisting}
+
+\paragraph{dig} (Domain Information Groper) Strumento per interrogare i server DNS.
+\begin{lstlisting}[language=bash]
+"dig")
+    echo -n "Inserisci il dominio da interrogare: "
+    read domain
+    echo "Eseguendo 'dig $domain'..."
+    dig $domain
+    ;;
+\end{lstlisting}
+
+\paragraph{host} Utility semplice per effettuare ricerche DNS.
+\begin{lstlisting}[language=bash]
+"host")
+    echo -n "Inserisci il dominio o l'indirizzo IP da interrogare: "
+    read host
+    echo "Eseguendo 'host $host'..."
+    host $host
+    ;;
+\end{lstlisting}
+
+\paragraph{hosts-edit} Apre il file \texttt{/etc/hosts} con \texttt{vi} per modificare la risoluzione
+statica dei nomi host.
+\begin{lstlisting}[language=bash]
+"hosts-edit")
+    sudo vi /etc/hosts
+    ;;
+\end{lstlisting}
+
+\paragraph{netstat} Mostra le connessioni di rete, le tabelle di routing e altre statistiche. In
+questo caso, filtra per porta.
+\begin{lstlisting}[language=bash]
+"netstat")
+    echo "Inserisci una porta: "
+    read port
+    sudo netstat -anp | grep "$port"
+    ;;
+\end{lstlisting}
+
+\paragraph{route} Mostra/manipola la tabella di routing IP.
+\begin{lstlisting}[language=bash]
+"route")
+    echo "Eseguendo 'netstat -r': Mostra la tabella di routing IP."
+    netstat -r
+    ;;
+\end{lstlisting}
+
+\paragraph{arp} Mostra/manipola la cache ARP del sistema.
+\begin{lstlisting}[language=bash]
+"arp")
+    echo "Eseguendo 'arp -a': Mostra la tabella ARP."
+    arp -a
+    ;;
+\end{lstlisting}
+
+\subsubsection{Shell}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{shell.png}
+    \caption{Interfaccia dei Comandi Shell}
+    \label{fig:shell}
+\end{figure}
+
+\paragraph{cd} Cambia la directory corrente. Questo comando è fondamentale per la navigazione
+nel file system.
+\begin{lstlisting}[language=bash]
+"cd")
+    echo -n "Inserisci il percorso: "
+    read path
+    cd $path
+    ;;
+\end{lstlisting}
+
+\paragraph{ls} Elenca i contenuti della directory corrente, mostrando file e altre directory.
+\begin{lstlisting}[language=bash]
+"ls")
+    ls -la
+    ;;
+\end{lstlisting}
+
+\paragraph{pwd} (Print Working Directory) Mostra il percorso completo della directory in cui ci si trova attualmente.
+\begin{lstlisting}[language=bash]
+"pwd")
+    pwd
+    ;;
+\end{lstlisting}
+
+\paragraph{history} Mostra un elenco degli ultimi comandi eseguiti nella sessione corrente.
+\begin{lstlisting}[language=bash]
+"history")
+    history
+    ;;
+\end{lstlisting}
+
+\paragraph{exit} Termina la sessione corrente della shell.
+\begin{lstlisting}[language=bash]
+"exit")
+    exit
+    ;;
+\end{lstlisting}
+
+\subsubsection{Hardware}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{hardware.png}
+    \caption{Interfaccia dei Comandi Hardware}
+    \label{fig:hardware}
+\end{figure}
+
+\paragraph{lscpu} Mostra informazioni dettagliate sull'architettura della CPU.
+\begin{lstlisting}[language=bash]
+"lscpu")
+    lscpu
+    ;;
+\end{lstlisting}
+
+\paragraph{lsusb} Elenca i dispositivi USB collegati al sistema.
+\begin{lstlisting}[language=bash]
+"lsusb")
+    lsusb
+    ;;
+\end{lstlisting}
+
+\paragraph{lspci} Elenca tutti i dispositivi PCI.
+\begin{lstlisting}[language=bash]
+"lspci")
+    lspci
+    ;;
+\end{lstlisting}
+
+\paragraph{lshw} Elenca informazioni dettagliate sull'hardware del sistema.
+\begin{lstlisting}[language=bash]
+"lshw")
+    sudo lshw
+    ;;
+\end{lstlisting}
+
+\paragraph{lsblk} Elenca i dispositivi a blocchi, come dischi e partizioni.
+\begin{lstlisting}[language=bash]
+"lsblk")
+    lsblk
+    ;;
+\end{lstlisting}
+
+\subsubsection{Kernel}
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{kernel.png}
+    \caption{Interfaccia dei Comandi Kernel}
+    \label{fig:kernel}
+\end{figure}
+
+\paragraph{dmesg} Stampa o controlla il ring buffer del kernel.
+\begin{lstlisting}[language=bash]
+"dmesg")
+    dmesg
+    ;;
+\end{lstlisting}
+
+\paragraph{lsmod} Mostra lo stato dei moduli nel Kernel Linux.
+\begin{lstlisting}[language=bash]
+"lsmod")
+    lsmod
+    ;;
+\end{lstlisting}
+
+\paragraph{modinfo} Mostra informazioni su un modulo del Kernel Linux.
+\begin{lstlisting}[language=bash]
+"modinfo")
+    echo -n "Inserisci il nome del modulo: "
+    read module
+    modinfo $module
+    ;;
+\end{lstlisting}
+
+\section{Conclusioni}
+MeShell è un eccellente esempio di come le tecnologie web moderne possano
+essere sfruttate per creare potenti strumenti di amministrazione di sistema.
+L'analisi del codice rivela un'architettura ben pensata: il backend Go gestisce
+la complessità del protocollo SSH e del PTY; il frontend JavaScript con
+Xterm.js offre un'esperienza utente fluida e nativa; lo script Bash astrae i
+comandi, rendendoli accessibili e riducendo la possibilità di errori. Questa
+sinergia tra componenti eterogenei crea uno strumento flessibile e potente,
+ideale per contesti didattici e per l'amministrazione rapida di sistemi.
+
+\end{document}

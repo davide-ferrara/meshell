@@ -1,0 +1,28 @@
+INFO:  latexindent version 3.24.4, 2024-07-18, a script to indent .tex files
+       latexindent lives here: /usr/share/texmf-dist/scripts/latexindent/
+       Fri Nov  7 10:15:01 2025
+       Filename: tesi.tex
+INFO:  Processing switches:
+       -m|--modifylinebreaks: modify line breaks
+INFO:  Directory for backup files and log file indent.log:
+       .
+INFO:  YAML settings read: defaultSettings.yaml
+       Reading defaultSettings.yaml from /usr/share/texmf-dist/scripts/latexindent/defaultSettings.yaml
+INFO:  YAML reading settings
+       The config file in "/home/dave/.indentconfig.yaml" will be read
+WARN:  The paths field cannot be read from /home/dave/.indentconfig.yaml; this means it is either empty or contains invalid YAML
+       See https://latexindentpl.readthedocs.io/en/latest/sec-indent-config-and-settings.html for an example
+INFO:  -l switch used without filename, will search for the following files in turn:
+       localSettings.yaml,latexindent.yaml,.localSettings.yaml,.latexindent.yaml
+INFO:  YAML settings read: -l switch
+       Multiple localSettings found, separated by commas:
+       localSettings.yaml, latexindent.yaml, .localSettings.yaml, .latexindent.yaml
+WARN:  yaml file not found: localSettings.yaml not found. Proceeding without it.
+WARN:  yaml file not found: latexindent.yaml not found. Proceeding without it.
+WARN:  yaml file not found: .localSettings.yaml not found. Proceeding without it.
+WARN:  yaml file not found: .latexindent.yaml not found. Proceeding without it.
+FATAL I couldn't find tesi.tex, are you sure it exists?
+      Exiting, no indentation done.
+       --------------
+INFO:  Please direct all communication/issues to:
+        https://github.com/cmhughes/latexindent.pl
