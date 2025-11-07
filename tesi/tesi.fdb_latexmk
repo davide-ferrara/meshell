@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1762529638.03777 "/home/dave/git/meshell/tesi/tesi.tex" "tesi.pdf" "tesi" 1762529638.64629 0
-  "/home/dave/git/meshell/tesi/tesi.tex" 1762529637.85216 36637 15382f5d45316aca7a55f2bd7ec11667 ""
+["pdflatex"] 1762533870.13308 "/home/dave/git/meshell/tesi/tesi.tex" "tesi.pdf" "tesi" 1762533871.09375 0
+  "/home/dave/git/meshell/tesi/tesi.tex" 1762533869.94197 38199 9eaf70cc4409ded3937ce950bca2155e ""
   "/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1755987285 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1755987285 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/share/texmf-dist/fonts/tfm/jknappen/ec/ecbx0900.tfm" 1755987285 3584 1a7de6c99457381c64abc1a7c545505f ""
@@ -102,14 +102,16 @@
   "gallery1.png" 1762459011.46661 57614 44c1d22f658e1255809025f4dfeb0d8c ""
   "hardware.png" 1762459011.46661 11154 a2b1c1faf5dbb06b466e73dd89361b81 ""
   "kernel.png" 1762459011.46661 7416 4569cd2cee99fab430f20790fc790eae ""
+  "logo.png" 1762533004.35137 617020 ac443f9839e9a90c11cc2505d562e8b7 ""
+  "network.png" 1762459011.4677 13952 5388aaa1150fec0a83d92c6e7bedb9f8 ""
   "package-managment.png" 1762459011.4677 13701 e3e90fab8c5f593a32fa42fcc949976f ""
   "quick-controls.png" 1762459011.4677 9282 63dacc3321f192de1b62ab9c73e20054 ""
   "shell.png" 1762459011.4677 11559 ecf48e7e623e4fc1185fb6e4b2cd6cb7 ""
   "system.png" 1762459011.4677 22539 63e6e4db4d6dd860734826c6f2da4744 ""
-  "tesi.aux" 1762529638.60094 12260 b992335620cef2520125d63515e1bc74 "pdflatex"
-  "tesi.out" 1762529638.60094 4302 9c4e45afecf8e7e495350bb118e51abc "pdflatex"
-  "tesi.tex" 1762529637.85216 36637 15382f5d45316aca7a55f2bd7ec11667 ""
-  "tesi.toc" 1762529638.60198 5959 2f6bd8698143b93c06a81ffd68bb563d "pdflatex"
+  "tesi.aux" 1762533871.04756 12738 ec2e6be0437a7d0ae128fb5f8d10da5a "pdflatex"
+  "tesi.out" 1762533871.04856 4302 9c4e45afecf8e7e495350bb118e51abc "pdflatex"
+  "tesi.tex" 1762533869.94197 38199 9eaf70cc4409ded3937ce950bca2155e ""
+  "tesi.toc" 1762533871.04904 6081 ecb55c1c0440280059e018542da93bd6 "pdflatex"
   "user-managment.png" 1762459011.4677 22062 c32190e62cfee6b8c5365a5876be4f27 ""
   (generated)
   "tesi.aux"

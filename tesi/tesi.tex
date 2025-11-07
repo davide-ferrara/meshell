@@ -35,7 +35,7 @@
 }
 \lstset{style=mystyle}
 
-\title{Tesi Laboratorio di amministrazione dei Sistemi \\ MeShell}
+\title{Tesi Laboratorio di Amministrazione dei Sistemi \\ MeShell}
 \author{Davide Ferrara 518629}
 \date{\today}
 
@@ -50,6 +50,16 @@
     Questa relazione analizza in modo approfondito l'architettura di MeShell, dissezionando il codice sorgente del backend in Go,
     del frontend in JavaScript e dello script meshell.sh per fornire una comprensione completa del suo funzionamento interno,
     con un focus specifico sulle pratiche di amministrazione di sistema.
+
+    \begin{figure}[h!]
+        \centering
+        \includegraphics[width=0.8\textwidth]{logo.png}
+        % \caption{MeShell Logo}
+        \label{fig:Meshell Logo}
+    \end{figure}
+
+
+
 \end{abstract}
 
 \newpage
@@ -89,7 +99,7 @@ All'interno dei nostri client invece basterá installare lo script Meshell esegu
    ./install.sh
 \end{lstlisting}
 
-Il seguente script creerá un link simbolico in /usr/bin che permetterá si eseguite i vari comandi Meshell all'interno dei client.
+Il seguente script creerá un link simbolico in /usr/bin che permetterá di eseguire i vari comandi Meshell all'interno dei client.
 \begin{lstlisting}{go}
     origin="$(pwd)/meshell.sh"
     dest="/usr/local/bin/meshell"
@@ -153,15 +163,6 @@ principali:
 \end{itemize}
 
 \subsection{La Sessione Terminale (tty handler)}
-Quando il frontend invia una richiesta all'endpoint \texttt{/tty}, l'handler esegue una
-sequenza di operazioni critiche che stabilisce la sessione interattiva, ovvero un flusso bidirezionale di byte interpretati successivamente in caratteri.
-In seguito le principali operazioni che svolge il server:
-\begin{enumerate}
-    \item \textbf{Apertura WebSocket:} Utilizzando la libreria \texttt{gorilla/websocket} la connessione HTTP iniziale viene trasformata in una connessione WebSocket bidirezionale.
-    \item \textbf{Connessione SSH:} Invoca la funzione \texttt{connectSSH} per stabilire una connessione SSH con le macchine remote, utilizzando credenziali pre-configurate.
-    \item \textbf{Setup della Sessione PTY:} Chiama \texttt{setupSSHSession} per richiedere uno pseudo-terminale (PTY) e avviare una shell remota.
-    \item \textbf{Avvio del Piping:} Infine, \texttt{startPiping} avvia le goroutine necessarie per inoltrare i dati in entrambe le direzioni: dal WebSocket allo stdin della shell SSH e dallo stdout/stderr della shell SSH di nuovo al WebSocket.
-\end{enumerate}
 In Linux la maggior parte degli \textbf{Emulatori di Terminale} (come gnome-terminal o alacritty) utilizzano una shell come \textbf{Bash} per eseguire comandi e script.
 Esistono poi anche altre varianti di shell, come ad esempio Fish.\newline
 Bash non è altro che un programma, che è possibile eseguire da \textbf{/bin/bash}, ma come fa l'Emulatore di Terminale a comunicare con esso?
@@ -184,10 +185,20 @@ avranno stabilito una comunicazione bidirezionale detta anche \textbf{IPC}.
     |
 \end{lstlisting}
 
-Da questo output del comando pstree possiamo vedere come il Terminal Emulator, abbia come figli Bash e pstree che é il comando eseguito.
+Da questo output del comando pstree possiamo vedere come Alacritty (l'emulatore), abbia come figli Bash e pstree che é il comando eseguito.
 La logica di Meshell é proprio questa, il nostro frontend é il Terminal Emulator (un ambiente grafico), il Server Go non é altro che il ponte
 (come il kernel) e il client SSH il PTY.
 
+
+Quando il frontend invia una richiesta all'endpoint \texttt{/tty}, l'handler esegue una
+sequenza di operazioni critiche che stabilisce la sessione interattiva, ovvero un flusso bidirezionale di byte interpretati successivamente in caratteri.
+In seguito le principali operazioni del \textit{tty hanlder:}
+\begin{enumerate}
+    \item \textbf{Apertura WebSocket:} Utilizzando la libreria \texttt{gorilla/websocket} la connessione HTTP iniziale viene trasformata in una connessione WebSocket bidirezionale.
+    \item \textbf{Connessione SSH:} Invoca la funzione \texttt{connectSSH} per stabilire una connessione SSH con le macchine remote, utilizzando credenziali pre-configurate.
+    \item \textbf{Setup della Sessione PTY:} Chiama \texttt{setupSSHSession} per richiedere uno pseudo-terminale (PTY) e avviare una shell remota.
+    \item \textbf{Avvio del Piping:} Infine, \texttt{startPiping} avvia le goroutine necessarie per inoltrare i dati in entrambe le direzioni: dal WebSocket allo stdin della shell SSH e dallo stdout/stderr della shell SSH di nuovo al WebSocket.
+\end{enumerate}
 \subsection{Connessione SSH (connectSSH)}
 Questa funzione astrae la logica di connessione SSH.
 \begin{lstlisting}[language=Go]
@@ -196,7 +207,8 @@ func connectSSH(user string, password string, addr string) (*ssh.Client, error) 
     khPath := filepath.Join(home, ".ssh", "known_hosts")
     hostKeyCallback, err := knownhosts.New(khPath)
     if err != nil {
-       // Host Sconosciuto 
+       // Host Sconosciuto
+       // Impossibile coonnettersi! 
     }
 
     config := &ssh.ClientConfig{
@@ -214,9 +226,10 @@ Dal punto di vista della sicurezza, è importante notare il meccanismo di
 \texttt{HostKeyCallback}. Il codice tenta di utilizzare il file
 \texttt{.ssh/known\_hosts} per verificare l'identità del server remoto,
 proteggendo da attacchi man-in-the-middle.
+Nel caso vada tutto a buon fine la funzione ritorna un handle alla connessione SSH di una specifica macchina.
 
 \subsection{Creazione del PTY (setupSSHSession)}
-Questa è la funzione dove viene creato l'ambiente terminale interattivo.
+Questa è la funzione dove viene creato il PTY.
 \begin{lstlisting}[language=Go]
 func setupSSHSession(client *ssh.Client, rows int, cols int) (*ssh.Session, io.WriteCloser, io.Reader, io.Reader, error) {
     session, err := client.NewSession()
@@ -244,13 +257,14 @@ func setupSSHSession(client *ssh.Client, rows int, cols int) (*ssh.Session, io.W
 \end{lstlisting}
 La chiamata a \texttt{session.RequestPty} è fondamentale. Chiede al server SSH
 di allocare uno pseudo-terminale, specificando il tipo di emulazione
-(\texttt{"xterm"}) e le dimensioni. Senza un PTY, non sarebbe possibile avere
-una shell interattiva, ma solo eseguire comandi singoli. Subito dopo,
+(\texttt{"xterm"}) e le dimensioni.
+Xterm è l'emulatore standard di terminale in ambiente Unix-like.
+Un utente può avere più sessioni di xterm avviate su uno o più display, le quali forniscono un sistema di input/output per i processi lanciati.
+Senza un PTY, non sarebbe possibile avere una shell interattiva, ma solo eseguire comandi singoli. Subito dopo,
 \texttt{session.Shell()} avvia la shell remota associata a questo PTY.
 
 \subsection{Flusso Dati Bidirezionale (startPiping)}
-Questa funzione orchestra il flusso di dati tra il client web e la shell remota
-tramite tre goroutine concorrenti.
+Questa funzione orchestra il flusso di dati tra il client web e la shell remota tramite tre \textbf{goroutine} concorrenti.
 \begin{lstlisting}[language=Go]
 func startPiping(ws *websocket.Conn, sshStdin io.WriteCloser, sshStdout, sshStderr io.Reader, sshSession *ssh.Session) error {
     var wg sync.WaitGroup
@@ -343,7 +357,6 @@ WebSocket.
     // ...
   }
 \end{lstlisting}
-ahhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 Quando la connessione è aperta (\texttt{onopen}), il terminale riceve il focus
 e viene attivato l'handler \texttt{onData}. Da questo momento, ogni tasto
 premuto dall'utente viene inviato al server. Viceversa, ogni messaggio ricevuto
@@ -380,7 +393,7 @@ garantire che comandi come \texttt{cd} modifichino la shell corrente.
 \subsection{Struttura Principale}
 Lo script utilizza un costrutto \texttt{case} per interpretare il secondo
 argomento (\texttt{\$2}) passato dopo l'opzione \texttt{--cmd}.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 case "$1" in
   "--cmd")
     case $2 in
@@ -400,6 +413,7 @@ esac
 \subsection{Comandi dall'Interfaccia Web (Amministrazione Guest)}
 
 \subsubsection{Controlli Rapidi}
+I comandi rapidi forniti da Meshell sono quelli utilizzati per muoversi all'interno del Terminale e sono i seguenti:
 
 \begin{figure}[h!]
     \centering
@@ -413,7 +427,7 @@ esac
 \paragraph{List (ls)} Elenca i file e le directory nella posizione corrente. Lo script
 \texttt{meshell.sh} usa l'alias \texttt{ls -la} per fornire un output
 dettagliato.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "ls")
     ls -la
     ;;
@@ -421,9 +435,9 @@ dettagliato.
 
 \paragraph{Navigazione (cd, pwd)} I comandi \texttt{cd} (Change Directory) e \texttt{pwd} (Print Working
 Directory) sono gestiti per permettere una navigazione di base. I pulsanti
-rapidi offrono scorciatoie per le directory \texttt{..} (parente), \texttt{\~}
+rapidi offrono scorciatoie per le directory \texttt{..} (parent), \texttt{\~}
 (home) e \texttt{/} (root).
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "cd")
     echo -n "Inserisci il percorso: "
     read path
@@ -443,9 +457,10 @@ terminale per migliorare la leggibilità, agendo direttamente sulla
 configurazione di Xterm.js.
 \paragraph{Meshell Update} Questo comando aggiorna lo script \texttt{meshell.sh} stesso, eseguendo un
 \texttt{git pull} dalla directory in cui è stato clonato il repository.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "meshell-update")
-    # ... (codice per l'aggiornamento)
+    cd /usr/share/meshell
+    git pull
     ;;
 \end{lstlisting}
 
@@ -460,7 +475,7 @@ configurazione di Xterm.js.
 
 \paragraph{update} Questo comando esegue l'aggiornamento completo del sistema, sincronizzando
 prima la lista dei pacchetti e poi installando le nuove versioni disponibili.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "update")
     echo "Eseguendo 'sudo apt update && sudo apt upgrade'..."
     sudo apt update && sudo apt -y upgrade
@@ -469,7 +484,7 @@ prima la lista dei pacchetti e poi installando le nuove versioni disponibili.
 
 \paragraph{install} Permette all'amministratore di installare un nuovo pacchetto. Il comando è
 interattivo e richiede di inserire il nome del pacchetto da installare.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "install")
     echo -n "Inserisci il nome del pacchetto da installare: "
     read package
@@ -480,7 +495,7 @@ interattivo e richiede di inserire il nome del pacchetto da installare.
 
 \paragraph{search} Cerca un pacchetto nei repository configurati, utile per trovare il nome
 corretto di un software prima dell'installazione.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "search")
     echo -n "Inserisci il nome del pacchetto da cercare: "
     read package
@@ -490,7 +505,7 @@ corretto di un software prima dell'installazione.
 \end{lstlisting}
 
 \paragraph{remove} Rimuove un pacchetto installato dal sistema.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "remove")
     echo -n "Inserisci il nome del pacchetto da rimuovere: "
     read package
@@ -510,7 +525,7 @@ corretto di un software prima dell'installazione.
 
 \paragraph{top} Avvia il tool interattivo \texttt{top}, che fornisce una vista in tempo reale
 dei processi in esecuzione e del consumo di risorse.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "top")
     echo "Eseguendo 'top': Mostra i processi in esecuzione..."
     top
@@ -519,7 +534,7 @@ dei processi in esecuzione e del consumo di risorse.
 
 \paragraph{ps} Mostra i processi attivi in una struttura ad albero (\texttt{--forest}) per
 visualizzare le relazioni padre-figlio.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "ps")
     echo "Eseguendo 'ps aux --forest': Mostra i processi..."
     ps aux --forest
@@ -528,7 +543,7 @@ visualizzare le relazioni padre-figlio.
 
 \paragraph{searchps} Cerca un processo specifico tramite \texttt{grep}. Richiede interattivamente il
 nome all'utente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "searchps")
     echo "Eseguendo 'ps aux | grep \$name': Mostra i processi..."
     read -p "Nome del processo da cercare: " psname
@@ -538,7 +553,7 @@ nome all'utente.
 
 \paragraph{kill} Termina un processo. Richiede interattivamente il Process ID (PID) da
 terminare.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "kill")
     echo -n "Inserisci l'ID del processo da terminare: "
     read pid
@@ -549,7 +564,7 @@ terminare.
 
 \paragraph{uname} Fornisce informazioni dettagliate sul sistema, inclusa la versione del kernel,
 il nome host e l'architettura.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "uname")
     echo "Eseguendo 'uname -a': Mostra le informazioni di sistema."
     uname -a
@@ -558,7 +573,7 @@ il nome host e l'architettura.
 
 \paragraph{uptime} Mostra da quanto tempo il sistema e in esecuzione in un formato leggibile e
 amichevole.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "uptime")
     echo "Eseguendo 'uptime -p': Mostra da quanto tempo il sistema e attivo."
     uptime -p
@@ -567,7 +582,7 @@ amichevole.
 
 \paragraph{free} Mostra l'utilizzo della memoria RAM e dell'area di swap in un formato leggibile
 (human-readable).
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "free")
     echo "Eseguendo 'free -h': Mostra l'utilizzo della memoria..."
     free -h
@@ -576,15 +591,15 @@ amichevole.
 
 \paragraph{du} Mostra l'utilizzo dello spazio su disco per la directory corrente in formato
 leggibile.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "du")
     echo "Eseguendo 'du -h': Mostra l'utilizzo dello spazio su disco..."
     du -h
     ;;
 \end{lstlisting}
 
-\paragraph{w} Mostra chi e attualmente loggato nel sistema e cosa sta facendo.
-\begin{lstlisting}[language=bash]
+\paragraph{w} Mostra chi é attualmente loggato nel sistema e cosa sta facendo.
+\begin{lstlisting}{go}
 "w")
     echo "Eseguendo 'w': Mostra chi e loggato."
     w
@@ -592,7 +607,7 @@ leggibile.
 \end{lstlisting}
 
 \paragraph{last} Mostra un elenco degli ultimi accessi (login) al sistema.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "last")
     echo "Eseguendo 'last -n 10': Mostra gli ultimi 10 login."
     last -n 10
@@ -600,7 +615,7 @@ leggibile.
 \end{lstlisting}
 
 \paragraph{date} Mostra la data e l'ora correnti del sistema.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "date")
     echo "Eseguendo 'date': Mostra la data e l'ora correnti."
     date
@@ -608,7 +623,7 @@ leggibile.
 \end{lstlisting}
 
 \paragraph{cal} Mostra un semplice calendario del mese corrente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "cal")
     echo "Eseguendo 'cal': Mostra il calendario."
     cal
@@ -616,7 +631,7 @@ leggibile.
 \end{lstlisting}
 
 \paragraph{shutdown} Arresta il sistema. Tipicamente richiede privilegi di superutente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "shutdown")
     echo "Eseguendo 'shutdown': Arresta il sistema."
     shutdown
@@ -624,7 +639,7 @@ leggibile.
 \end{lstlisting}
 
 \paragraph{reboot} Riavvia il sistema. Tipicamente richiede privilegi di superutente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "reboot")
     echo "Eseguendo 'reboot': Riavvia il sistema."
     reboot
@@ -641,8 +656,8 @@ leggibile.
 \end{figure}
 
 \paragraph{inode} Elenca i file e le directory nella posizione corrente, mostrando il loro numero
-di inode, utile per diagnosi a basso livello del file system.
-\begin{lstlisting}[language=bash]
+di inode.
+\begin{lstlisting}{go}
 "inode")
     echo "Eseguendo 'ls -li': Elenca i file... con gli inode."
     ls -li
@@ -650,7 +665,7 @@ di inode, utile per diagnosi a basso livello del file system.
 \end{lstlisting}
 
 \paragraph{mkdir} Crea una nuova directory. Il nome viene richiesto interattivamente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "mkdir")
     echo -n "Inserisci il nome della cartella da creare: "
     read folder_name
@@ -661,7 +676,7 @@ di inode, utile per diagnosi a basso livello del file system.
 
 \paragraph{touch} Crea un file vuoto, utile per testare permessi o per script che necessitano
 della preesistenza di un file.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "touch")
     echo -n "Inserisci il nome del file da creare: "
     read filename
@@ -672,7 +687,7 @@ della preesistenza di un file.
 
 \paragraph{tree} Mostra la struttura delle directory in formato ad albero, con una profondità
 specificata dall'utente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "tree")
     read -p "Fino a che livello vuoi scendere? " n
     if [[ -z "$n" ]]; then
@@ -683,7 +698,7 @@ specificata dall'utente.
 \end{lstlisting}
 
 \paragraph{ln} Crea un link simbolico (symlink) da un file sorgente a una destinazione.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "ln")
     echo -n "Inserisci il file da linkare simbolicamente: "
     read source
@@ -696,7 +711,7 @@ specificata dall'utente.
 
 \paragraph{umask} Comando educativo che spiega il funzionamento della umask e permette di
 impostarne un nuovo valore per la sessione corrente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "umask")
     # ... (codice che mostra guida e chiede input)
     umask "$mask"
@@ -705,7 +720,7 @@ impostarne un nuovo valore per la sessione corrente.
 
 \paragraph{chmod} Guida interattiva per la modifica dei permessi di un file, spiegando il formato
 ottale prima di eseguire il comando.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "chmod")
     # ... (codice che mostra guida e chiede input)
     chmod $permissions "$filename"
@@ -714,7 +729,7 @@ ottale prima di eseguire il comando.
 
 \paragraph{chown} Cambia il proprietario e/o il gruppo di un file o di una directory. Richiede
 privilegi di superutente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "chown")
     # ... (codice che chiede input)
     sudo chown -R $owner:$group $filename
@@ -722,7 +737,7 @@ privilegi di superutente.
 \end{lstlisting}
 
 \paragraph{find} Cerca file all'interno di un dato percorso, basandosi sul nome.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "find")
     echo -n "Inserisci il percorso in cui cercare: "
     read path
@@ -734,7 +749,7 @@ privilegi di superutente.
 \end{lstlisting}
 
 \paragraph{file} Determina il tipo di un file (es. testo ASCII, eseguibile, immagine).
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "file")
     echo -n "Inserisci il nome del file: "
     read filename
@@ -754,7 +769,7 @@ privilegi di superutente.
 
 \paragraph{showusers} Mostra tutti gli utenti non di sistema, filtrando per UID >= 1000 dal file
 \texttt{/etc/passwd}.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "showusers")
     echo "Utenti del sistema con UID >= 1000..."
     awk -F: '($3 >= 1000) {print $1}' /etc/passwd
@@ -763,7 +778,7 @@ privilegi di superutente.
 
 \paragraph{showgroups} Mostra tutti i gruppi non di sistema, filtrando per GID >= 1000 dal file
 \texttt{/etc/group}.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "showgroups")
     echo "Gruppi del sistema con UID >= 1000..."
     awk -F: '($3 >= 1000) {print $1}' /etc/group
@@ -771,7 +786,7 @@ privilegi di superutente.
 \end{lstlisting}
 
 \paragraph{groups} Mostra i gruppi a cui l'utente corrente appartiene.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "groups")
     echo -n "Gruppi a cui appartiene $(whoami): "
     groups
@@ -781,7 +796,7 @@ privilegi di superutente.
 \paragraph{useradd} Crea un nuovo utente nel sistema, creando la sua home directory (\texttt{-m}) e
 impostando \texttt{/bin/bash} come shell di default (\texttt{-s}). Richiede poi
 di impostare una password.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "useradd")
     echo -n "Inserisci il nome utente da creare: "
     read username
@@ -793,7 +808,7 @@ di impostare una password.
 \end{lstlisting}
 
 \paragraph{groupadd} Crea un nuovo gruppo di utenti.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "groupadd")
     echo -n "Inserisci il nome del gruppo da creare: "
     read group_name
@@ -803,7 +818,7 @@ di impostare una password.
 \end{lstlisting}
 
 \paragraph{user-add-to-group} Aggiunge un utente esistente a un gruppo esistente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "user-add-to-group")
     echo -n "Inserisci il nome dell'utente da aggiungere al gruppo: "
     read user
@@ -816,7 +831,7 @@ di impostare una password.
 
 \paragraph{userdel} Elimina un utente dal sistema, forzando la rimozione (\texttt{-f}) e
 cancellando la sua home directory (\texttt{-r}).
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "userdel")
     echo -n "Inserisci il nome utente da eliminare: "
     read username
@@ -826,7 +841,7 @@ cancellando la sua home directory (\texttt{-r}).
 \end{lstlisting}
 
 \paragraph{groupdel} Elimina un gruppo di utenti.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "groupdel")
     echo -n "Inserisci il nome del gruppo da eliminare: "
     read group_name
@@ -836,7 +851,7 @@ cancellando la sua home directory (\texttt{-r}).
 \end{lstlisting}
 
 \paragraph{user-remove-from-group} Rimuove un utente da un gruppo specifico.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "user-remove-from-group")
     echo -n "Inserisci il nome dell'utente da rimuovere: "
     read user
@@ -848,7 +863,7 @@ cancellando la sua home directory (\texttt{-r}).
 \end{lstlisting}
 
 \paragraph{passwd} Permette all'utente corrente di cambiare la propria password.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "passwd")
     echo "Passwd permette di cambiare la password dell'utente corrente."
     passwd
@@ -856,7 +871,7 @@ cancellando la sua home directory (\texttt{-r}).
 \end{lstlisting}
 
 \paragraph{whoami} Mostra il nome dell'utente attualmente loggato.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "whoami")
     echo "Eseguendo 'whoami': Mostra l'utente corrente."
     whoami
@@ -865,7 +880,7 @@ cancellando la sua home directory (\texttt{-r}).
 
 \paragraph{id} Mostra l'identità dell'utente corrente, inclusi UID, GID e i gruppi di
 appartenenza.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "id")
     echo "Eseguendo 'id': Mostra l'ID dell'utente e del gruppo."
     id
@@ -874,16 +889,16 @@ appartenenza.
 
 \subsubsection{Network}
 
-% \begin{figure}[h!]
-% 	\centering
-% 	\includegraphics[width=0.8\textwidth]{network.png}
-% 	\caption{Interfaccia dei Comandi di Rete}
-% 	\label{fig:network}
-% \end{figure}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{network.png}
+    \caption{Interfaccia dei Comandi di Rete}
+    \label{fig:network}
+\end{figure}
 
 \paragraph{ping} Invia pacchetti ICMP a un host per verificarne la raggiungibilità e misurare la
 latenza.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "ping")
     echo -n "Inserisci l'host da pingare: "
     read host
@@ -893,7 +908,7 @@ latenza.
 \end{lstlisting}
 
 \paragraph{wget} Scarica file da un URL specificato.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "wget")
     echo -n "Inserisci l'URL da scaricare: "
     read url
@@ -904,7 +919,7 @@ latenza.
 
 \paragraph{curl} Trasferisce dati da o verso un server, usando vari protocolli. Utile per
 testare API.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "curl")
     echo -n "Inserisci l'URL da scaricare: "
     read url
@@ -915,7 +930,7 @@ testare API.
 
 \paragraph{ip} Comando moderno per visualizzare e manipolare routing, dispositivi, policy e
 tunnel.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "ip")
     echo "Eseguendo 'ip a': Mostra le informazioni sull'interfaccia di rete."
     ip a
@@ -923,7 +938,7 @@ tunnel.
 \end{lstlisting}
 
 \paragraph{ifconfig} Comando legacy per la configurazione delle interfacce di rete.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "ifconfig")
     echo "Eseguendo 'ifconfig': Mostra le informazioni sull'interfaccia di rete."
     ifconfig
@@ -931,7 +946,7 @@ tunnel.
 \end{lstlisting}
 
 \paragraph{dig} (Domain Information Groper) Strumento per interrogare i server DNS.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "dig")
     echo -n "Inserisci il dominio da interrogare: "
     read domain
@@ -941,7 +956,7 @@ tunnel.
 \end{lstlisting}
 
 \paragraph{host} Utility semplice per effettuare ricerche DNS.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "host")
     echo -n "Inserisci il dominio o l'indirizzo IP da interrogare: "
     read host
@@ -952,7 +967,7 @@ tunnel.
 
 \paragraph{hosts-edit} Apre il file \texttt{/etc/hosts} con \texttt{vi} per modificare la risoluzione
 statica dei nomi host.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "hosts-edit")
     sudo vi /etc/hosts
     ;;
@@ -960,7 +975,7 @@ statica dei nomi host.
 
 \paragraph{netstat} Mostra le connessioni di rete, le tabelle di routing e altre statistiche. In
 questo caso, filtra per porta.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "netstat")
     echo "Inserisci una porta: "
     read port
@@ -969,7 +984,7 @@ questo caso, filtra per porta.
 \end{lstlisting}
 
 \paragraph{route} Mostra/manipola la tabella di routing IP.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "route")
     echo "Eseguendo 'netstat -r': Mostra la tabella di routing IP."
     netstat -r
@@ -977,7 +992,7 @@ questo caso, filtra per porta.
 \end{lstlisting}
 
 \paragraph{arp} Mostra/manipola la cache ARP del sistema.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "arp")
     echo "Eseguendo 'arp -a': Mostra la tabella ARP."
     arp -a
@@ -993,41 +1008,71 @@ questo caso, filtra per porta.
     \label{fig:shell}
 \end{figure}
 
-\paragraph{cd} Cambia la directory corrente. Questo comando è fondamentale per la navigazione
-nel file system.
-\begin{lstlisting}[language=bash]
-"cd")
-    echo -n "Inserisci il percorso: "
-    read path
-    cd $path
-    ;;
-\end{lstlisting}
-
-\paragraph{ls} Elenca i contenuti della directory corrente, mostrando file e altre directory.
-\begin{lstlisting}[language=bash]
-"ls")
-    ls -la
-    ;;
-\end{lstlisting}
-
-\paragraph{pwd} (Print Working Directory) Mostra il percorso completo della directory in cui ci si trova attualmente.
-\begin{lstlisting}[language=bash]
-"pwd")
-    pwd
-    ;;
-\end{lstlisting}
-
 \paragraph{history} Mostra un elenco degli ultimi comandi eseguiti nella sessione corrente.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "history")
     history
     ;;
 \end{lstlisting}
 
-\paragraph{exit} Termina la sessione corrente della shell.
-\begin{lstlisting}[language=bash]
-"exit")
-    exit
+\paragraph{which} Mostra il percorso completo di un comando.
+\begin{lstlisting}{go}
+"which")
+    echo -n "Inserisci il nome del comando: "
+    read command
+    echo "Eseguendo \'which $command\': Mostra il percorso completo del comando."
+    which $command
+    ;;
+\end{lstlisting}
+
+\paragraph{type} Mostra il tipo di un comando (es. alias, builtin, file).
+\begin{lstlisting}{go}
+    echo -n "Inserisci il nome del comando: "
+    read command
+    echo "Eseguendo \'type $command\': Mostra il tipo di comando."
+    type $command
+    ;;
+\end{lstlisting}
+
+\paragraph{alias} Crea un alias per un comando. L'alias viene salvato in bash\_aliases.
+\begin{lstlisting}{go}
+     echo -n "Inserisci il nome dell\'alias: "
+     read alias_name
+     echo -n "Inserisci il comando per l\'alias: "
+     read command
+     echo "Eseguendo \'alias $alias_name=\\\"$command\\\"\': Crea un alias per un comando."
+     echo "alias $alias_name=\'$command\'" >> ~/.bash_aliases
+     source ~/.bash_aliases
+     ;;
+ \end{lstlisting}
+
+\paragraph{Rimuovi Alias} Apre il file \texttt{.bash\_aliases} con \texttt{vi} per rimuovere un alias.
+\begin{lstlisting}{go}
+"alias-remove")
+    vi ~/.bash_aliases
+    ;;
+\end{lstlisting}
+
+\paragraph{prompt} Mostra il prompt della shell corrente.
+\begin{lstlisting}{go}
+"prompt")
+    echo -n "Prompt della shell corrente: "
+    echo $PS1
+    ;;
+\end{lstlisting}
+
+\paragraph{path} Mostra il percorso dal quale la shell cerca gli eseguibili.
+\begin{lstlisting}{go}
+"path")
+    echo -n "Percorso dal quale la shell cerca gli esecuibili: "
+    echo $PATH
+    ;;
+\end{lstlisting}
+
+\paragraph{bashrc} Apre il file .bashrc con \texttt{vi} per modificare la configurazione della shell.
+\begin{lstlisting}{go}
+"bashrc")
+    vi ~/.bashrc
     ;;
 \end{lstlisting}
 
@@ -1040,38 +1085,57 @@ nel file system.
     \label{fig:hardware}
 \end{figure}
 
-\paragraph{lscpu} Mostra informazioni dettagliate sull'architettura della CPU.
-\begin{lstlisting}[language=bash]
-"lscpu")
-    lscpu
-    ;;
-\end{lstlisting}
-
-\paragraph{lsusb} Elenca i dispositivi USB collegati al sistema.
-\begin{lstlisting}[language=bash]
-"lsusb")
-    lsusb
-    ;;
-\end{lstlisting}
-
-\paragraph{lspci} Elenca tutti i dispositivi PCI.
-\begin{lstlisting}[language=bash]
-"lspci")
-    lspci
-    ;;
-\end{lstlisting}
-
-\paragraph{lshw} Elenca informazioni dettagliate sull'hardware del sistema.
-\begin{lstlisting}[language=bash]
+\paragraph{lshw} Mostra le informazioni sull'hardware del sistema.
+\begin{lstlisting}{go}
 "lshw")
+    if ! command -v lshw &> /dev/null
+    then
+        echo "lshw could not be found"
+        echo "Please install it using: sudo apt install lshw"
+        exit
+    fi
+    echo "Eseguendo 'sudo lshw': Mostra le informazioni sull'hardware del sistema."
     sudo lshw
     ;;
 \end{lstlisting}
 
-\paragraph{lsblk} Elenca i dispositivi a blocchi, come dischi e partizioni.
-\begin{lstlisting}[language=bash]
+\paragraph{lsblk} Mostra i dispositivi a blocchi.
+\begin{lstlisting}{go}
 "lsblk")
+    if ! command -v lsblk &> /dev/null
+    then
+        echo "lsblk could not be found"
+        echo "Please install it using: sudo apt install util-linux"
+        exit
+    fi
+    echo "Eseguendo 'lsblk': Mostra i dispositivi a blocchi."
     lsblk
+    ;;
+\end{lstlisting}
+
+\paragraph{lspci} Mostra i dispositivi PCI.
+\begin{lstlisting}{go}
+"lspci")
+    if ! command -v lspci &> /dev/null
+    then
+        echo "Installalo usando: sudo apt install pciutils"
+        exit
+    fi
+    echo "Eseguendo 'lspci': Mostra i dispositivi PCI."
+    lspci
+    ;;
+\end{lstlisting}
+
+\paragraph{lsusb} Mostra i dispositivi USB.
+\begin{lstlisting}{go}
+"lsusb")
+    if ! command -v lsusb &> /dev/null
+    then
+        echo "Installalo usando: sudo apt install usbutils"
+        exit
+    fi
+    echo "Eseguendo 'lsusb': Mostra i dispositivi USB."
+    lsusb
     ;;
 \end{lstlisting}
 
@@ -1084,37 +1148,37 @@ nel file system.
     \label{fig:kernel}
 \end{figure}
 
-\paragraph{dmesg} Stampa o controlla il ring buffer del kernel.
-\begin{lstlisting}[language=bash]
-"dmesg")
-    dmesg
-    ;;
-\end{lstlisting}
-
 \paragraph{lsmod} Mostra lo stato dei moduli nel Kernel Linux.
-\begin{lstlisting}[language=bash]
+\begin{lstlisting}{go}
 "lsmod")
+    echo "Eseguendo 'lsmod': Mostra i moduli del kernel."
     lsmod
     ;;
 \end{lstlisting}
 
-\paragraph{modinfo} Mostra informazioni su un modulo del Kernel Linux.
-\begin{lstlisting}[language=bash]
-"modinfo")
-    echo -n "Inserisci il nome del modulo: "
-    read module
-    modinfo $module
+
+\paragraph{dmesg} Stampa o controlla il ring buffer del kernel.
+\begin{lstlisting}{go}
+"dmesg")
+    echo "Eseguendo 'dmesg': Mostra i messaggi del kernel."
+    sudo dmesg
     ;;
 \end{lstlisting}
+\paragraph{journalctl} Mostra il journal di sistema.
+\begin{lstlisting}{go}
+"journalctl")
+    echo "Eseguendo 'journalctl': Mostra il journal di sistema."
+    journalctl
+    ;;
+\end{lstlisting}
+
 
 \section{Conclusioni}
 MeShell è un eccellente esempio di come le tecnologie web moderne possano
 essere sfruttate per creare potenti strumenti di amministrazione di sistema.
-L'analisi del codice rivela un'architettura ben pensata: il backend Go gestisce
-la complessità del protocollo SSH e del PTY; il frontend JavaScript con
-Xterm.js offre un'esperienza utente fluida e nativa; lo script Bash astrae i
-comandi, rendendoli accessibili e riducendo la possibilità di errori. Questa
-sinergia tra componenti eterogenei crea uno strumento flessibile e potente,
-ideale per contesti didattici e per l'amministrazione rapida di sistemi.
-
+Il backend Go gestisce la complessità del protocollo SSH e del PTY mentre il frontend JavaScript con
+Xterm.js offre un'esperienza utente fluida e nativa con la poossibilitá di amministrare piú macchine da una
+singola pagina web grazie allo script Bash che astrae i comandi, rendendoli accessibili e riducendo la possibilità di errori.
+\textit{La seguente tesi fornisce un approossimazione dei vari comandi e la loro implementazione, per ulteriori dettagli
+    é consigliato leggere il codice sorgente.}
 \end{document}

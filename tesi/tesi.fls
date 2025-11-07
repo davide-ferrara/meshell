@@ -142,6 +142,11 @@ INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmsy8.tfm
 INPUT /usr/share/texmf-dist/fonts/tfm/public/cm/cmsy6.tfm
 INPUT /usr/share/texmf-dist/fonts/tfm/jknappen/ec/ecrm0900.tfm
 INPUT /usr/share/texmf-dist/fonts/tfm/jknappen/ec/ecbx0900.tfm
+INPUT ./logo.png
+INPUT ./logo.png
+INPUT ./logo.png
+INPUT ./logo.png
+INPUT ./logo.png
 INPUT /var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map
 INPUT /usr/share/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc
 INPUT /usr/share/texmf-dist/fonts/tfm/jknappen/ec/ecrm1440.tfm
@@ -174,12 +179,6 @@ INPUT ./gallery1.png
 INPUT ./gallery1.png
 INPUT ./gallery1.png
 INPUT /usr/share/texmf-dist/fonts/tfm/jknappen/ec/ectt1200.tfm
-INPUT /usr/share/texmf-dist/tex/latex/listings/lstlang1.sty
-INPUT /usr/share/texmf-dist/tex/latex/listings/lstlang1.sty
-INPUT /usr/share/texmf-dist/tex/latex/listings/lstlang1.sty
-INPUT /usr/share/texmf-dist/tex/latex/listings/lstlang1.sty
-INPUT /usr/share/texmf-dist/tex/latex/listings/lstlang1.sty
-INPUT /usr/share/texmf-dist/tex/latex/listings/lstlang1.sty
 INPUT ./quick-controls.png
 INPUT ./quick-controls.png
 INPUT ./quick-controls.png
@@ -205,6 +204,11 @@ INPUT ./user-managment.png
 INPUT ./user-managment.png
 INPUT ./user-managment.png
 INPUT ./user-managment.png
+INPUT ./network.png
+INPUT ./network.png
+INPUT ./network.png
+INPUT ./network.png
+INPUT ./network.png
 INPUT ./shell.png
 INPUT ./shell.png
 INPUT ./shell.png

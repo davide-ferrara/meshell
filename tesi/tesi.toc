@@ -27,8 +27,8 @@
 \contentsline {paragraph}{search}{10}{section*.10}%
 \contentsline {paragraph}{remove}{10}{section*.11}%
 \contentsline {subsubsection}{\numberline {2.2.3}Sistema}{10}{subsubsection.2.2.3}%
-\contentsline {paragraph}{top}{11}{section*.12}%
-\contentsline {paragraph}{ps}{11}{section*.13}%
+\contentsline {paragraph}{top}{10}{section*.12}%
+\contentsline {paragraph}{ps}{10}{section*.13}%
 \contentsline {paragraph}{searchps}{11}{section*.14}%
 \contentsline {paragraph}{kill}{11}{section*.15}%
 \contentsline {paragraph}{uname}{11}{section*.16}%
@@ -67,30 +67,32 @@
 \contentsline {paragraph}{id}{16}{section*.47}%
 \contentsline {subsubsection}{\numberline {2.2.6}Network}{16}{subsubsection.2.2.6}%
 \contentsline {paragraph}{ping}{16}{section*.48}%
-\contentsline {paragraph}{wget}{16}{section*.49}%
-\contentsline {paragraph}{curl}{16}{section*.50}%
+\contentsline {paragraph}{wget}{17}{section*.49}%
+\contentsline {paragraph}{curl}{17}{section*.50}%
 \contentsline {paragraph}{ip}{17}{section*.51}%
 \contentsline {paragraph}{ifconfig}{17}{section*.52}%
 \contentsline {paragraph}{dig}{17}{section*.53}%
 \contentsline {paragraph}{host}{17}{section*.54}%
 \contentsline {paragraph}{hosts-edit}{17}{section*.55}%
 \contentsline {paragraph}{netstat}{17}{section*.56}%
-\contentsline {paragraph}{route}{17}{section*.57}%
-\contentsline {paragraph}{arp}{17}{section*.58}%
+\contentsline {paragraph}{route}{18}{section*.57}%
+\contentsline {paragraph}{arp}{18}{section*.58}%
 \contentsline {subsubsection}{\numberline {2.2.7}Shell}{18}{subsubsection.2.2.7}%
-\contentsline {paragraph}{cd}{18}{section*.59}%
-\contentsline {paragraph}{ls}{18}{section*.60}%
-\contentsline {paragraph}{pwd}{18}{section*.61}%
-\contentsline {paragraph}{history}{18}{section*.62}%
-\contentsline {paragraph}{exit}{18}{section*.63}%
-\contentsline {subsubsection}{\numberline {2.2.8}Hardware}{18}{subsubsection.2.2.8}%
-\contentsline {paragraph}{lscpu}{19}{section*.64}%
-\contentsline {paragraph}{lsusb}{19}{section*.65}%
-\contentsline {paragraph}{lspci}{19}{section*.66}%
+\contentsline {paragraph}{history}{18}{section*.59}%
+\contentsline {paragraph}{which}{18}{section*.60}%
+\contentsline {paragraph}{type}{18}{section*.61}%
+\contentsline {paragraph}{alias}{18}{section*.62}%
+\contentsline {paragraph}{Rimuovi Alias}{19}{section*.63}%
+\contentsline {paragraph}{prompt}{19}{section*.64}%
+\contentsline {paragraph}{path}{19}{section*.65}%
+\contentsline {paragraph}{bashrc}{19}{section*.66}%
+\contentsline {subsubsection}{\numberline {2.2.8}Hardware}{19}{subsubsection.2.2.8}%
 \contentsline {paragraph}{lshw}{19}{section*.67}%
 \contentsline {paragraph}{lsblk}{19}{section*.68}%
-\contentsline {subsubsection}{\numberline {2.2.9}Kernel}{19}{subsubsection.2.2.9}%
-\contentsline {paragraph}{dmesg}{19}{section*.69}%
-\contentsline {paragraph}{lsmod}{19}{section*.70}%
-\contentsline {paragraph}{modinfo}{19}{section*.71}%
-\contentsline {section}{\numberline {3}Conclusioni}{20}{section.3}%
+\contentsline {paragraph}{lspci}{20}{section*.69}%
+\contentsline {paragraph}{lsusb}{20}{section*.70}%
+\contentsline {subsubsection}{\numberline {2.2.9}Kernel}{20}{subsubsection.2.2.9}%
+\contentsline {paragraph}{lsmod}{20}{section*.71}%
+\contentsline {paragraph}{dmesg}{20}{section*.72}%
+\contentsline {paragraph}{journalctl}{20}{section*.73}%
+\contentsline {section}{\numberline {3}Conclusioni}{21}{section.3}%
