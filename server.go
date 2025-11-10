@@ -27,7 +27,7 @@ type Client struct {
 
 var (
 	upgrader = websocket.Upgrader{} // Default settings
-	addr     = flag.String("addr", "localhost:8080", "HTTP service address")
+	addr     = flag.String("addr", "0.0.0.0:8080", "HTTP service address")
 	clients  = []Client{
 		{username: "lab1", password: "lab1", addr: "localhost:9090"},
 		{username: "lab2", password: "lab2", addr: "localhost:9091"},
@@ -275,3 +275,4 @@ func main() {
 		log.Fatalf("Fatal error during ListenAndServe: %v", err)
 	}
 }
+
